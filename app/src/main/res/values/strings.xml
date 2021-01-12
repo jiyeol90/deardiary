@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">deardiary</string>
+    <string name="prefLoginState">loginstate</string>
+    <string name="server_ip">15.164.50.236</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

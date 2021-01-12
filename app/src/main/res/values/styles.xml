@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="menustyle" parent="Theme.AppCompat.Light">
+        <item name="android:background">@color/colorPrimaryDark</item>
+    </style>
+</resources>
