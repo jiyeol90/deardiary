@@ -12,6 +12,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -126,6 +127,11 @@ public class AppStartActivity extends AppCompatActivity {
                 }
                 else if(id == R.id.logout){
                     Toast.makeText(context, title + ": 로그아웃 시도중", Toast.LENGTH_SHORT).show();
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString(getResources().getString(R.string.prefLoginState), "loggedout");
+                    editor.apply();
+                    startActivity(new Intent(AppStartActivity.this, MainActivity.class));
+                    finish();
                 }
 
                 return true;
