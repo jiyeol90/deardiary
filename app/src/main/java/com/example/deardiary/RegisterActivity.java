@@ -29,7 +29,7 @@ public class RegisterActivity extends AppCompatActivity {
     RadioGroup radioGroup;
     Button register;
 
-    private final String server_ip = getString(R.string.server_ip);
+    //private final String server_ip = getString(R.string.server_ip);
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -79,7 +79,7 @@ public class RegisterActivity extends AppCompatActivity {
         progressDialog.setTitle("Registering New Account");
         progressDialog.show();
 
-        String uRl = "http://"+ server_ip +"/loginregister/register.php";
+        String uRl = "http://15.164.50.236/loginregister/register.php";
         StringRequest request = new StringRequest(Request.Method.POST, uRl, new Response.Listener<String>() {
             @Override
             public void onResponse(String response)

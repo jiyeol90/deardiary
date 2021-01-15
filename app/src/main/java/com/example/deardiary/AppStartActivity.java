@@ -53,7 +53,7 @@ public class AppStartActivity extends AppCompatActivity {
 
         bottomNavigationView = findViewById(R.id.bottomNavi);
 
-        //BottomNavigation으로 fragment화면 전화
+        //BottomNavigation으로 fragment화면 전환
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
