@@ -2,20 +2,19 @@ package com.example.deardiary;
 
 import android.os.Bundle;
 
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import org.w3c.dom.Text;
+/**
+ * A simple {@link Fragment} subclass.
+ * Use the {@link BlankFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class BlankFragment extends Fragment {
 
-
-public class MyChattingFragment extends Fragment {
-
-    private TextView tv_data;
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -25,7 +24,7 @@ public class MyChattingFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public MyChattingFragment() {
+    public BlankFragment() {
         // Required empty public constructor
     }
 
@@ -38,18 +37,17 @@ public class MyChattingFragment extends Fragment {
      * @return A new instance of fragment BlankFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static MyChattingFragment newInstance(String param1, String param2) {
-        MyChattingFragment fragment = new MyChattingFragment();
+    public static BlankFragment newInstance(String param1, String param2) {
+        BlankFragment fragment = new BlankFragment();
         Bundle args = new Bundle();
-        args.putString("param1", param1);
-        args.putString("param2", param2);
+        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
 
-
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
@@ -60,19 +58,7 @@ public class MyChattingFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_my_chatting, container, false);
-
-
-        if(getArguments() != null){
-            String param1 = getArguments().getString("param1"); // 전달한 key 값
-            String param2 = getArguments().getString("param2"); // 전달한 key 값
-
-            tv_data = rootView.findViewById(R.id.data);
-
-            tv_data.setText(param1 + " , " + param2);
-        }
         // Inflate the layout for this fragment
-        return rootView;
+        return inflater.inflate(R.layout.fragment_blank, container, false);
     }
 }

@@ -16,6 +16,7 @@
         android:orientation="vertical"
         android:layout_below="@id/toolbar">
 
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -24,13 +25,43 @@
             android:textSize="20dp"
             android:textStyle="bold"
             android:textColor="@color/colorPrimaryDark"
-            android:layout_marginTop="20dp"/>
+            android:layout_marginTop="20dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
         <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/username"
+            android:id="@+id/user_id"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="20dp"
+            android:hint="User ID"
+            android:padding="5dp"
+            android:textColor="@color/colorPrimaryDark"
+            app:met_floatingLabel="normal" />
+
+        <Button
+            android:id="@+id/check_id"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginRight="20dp"
+            android:background="@color/colorPrimaryDark"
+            android:text="Check"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white" />
+    </LinearLayout>
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="User Name"
+            android:hint="Password"
             app:met_floatingLabel="normal"
             android:layout_marginTop="10dp"
             android:layout_marginRight="20dp"
@@ -50,17 +81,7 @@
             android:padding="5dp"
             android:textColor="@color/colorPrimaryDark"/>
 
-        <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Password"
-            app:met_floatingLabel="normal"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginLeft="20dp"
-            android:padding="5dp"
-            android:textColor="@color/colorPrimaryDark"/>
+
 
         <com.rengwuxian.materialedittext.MaterialEditText
             android:id="@+id/mobile"
@@ -78,6 +99,7 @@
             android:id="@+id/radiogp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="15dp"
             android:orientation="vertical">
 
             <RadioButton
@@ -106,7 +128,8 @@
             android:textAllCaps="false"
             android:background="@color/colorPrimaryDark"
             android:textColor="@android:color/white"
-            android:layout_marginTop="20dp"/>
+            android:layout_marginTop="20dp"
+            android:layout_marginHorizontal="15dp"/>
 
     </LinearLayout>
 
