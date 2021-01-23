@@ -20,10 +20,10 @@
         android:layout_marginTop="20dp"/>
 
     <com.rengwuxian.materialedittext.MaterialEditText
-        android:id="@+id/email"
+        android:id="@+id/user_id"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Email"
+        android:hint="ID"
         app:met_floatingLabel="normal"
         android:layout_marginTop="10dp"
         android:layout_marginRight="20dp"
@@ -61,6 +61,7 @@
         android:textAllCaps="false"
         android:background="@color/colorPrimaryDark"
         android:textColor="@android:color/white"
+        android:layout_marginHorizontal="20dp"
         android:layout_marginTop="20dp"/>
 
     <Button
@@ -71,6 +72,7 @@
         android:textAllCaps="false"
         android:background="@color/colorPrimaryDark"
         android:textColor="@android:color/white"
+        android:layout_marginHorizontal="20dp"
         android:layout_marginTop="20dp"/>
 
 </LinearLayout>

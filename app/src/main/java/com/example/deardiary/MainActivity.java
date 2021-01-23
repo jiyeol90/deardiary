@@ -26,11 +26,13 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
-    MaterialEditText email, password;
+    MaterialEditText userId, password;
     Button login, register;
     CheckBox loginState;
     SharedPreferences sharedPreferences;
 
+    //AWS EC2에 Elastic IP를 설정하지 않았기 때문에(유료) 서버를 재부팅 할때마다 IP주소가 바뀌어서 리소스 외부화를 해주었다.
+    String server_ip;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -38,13 +40,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        server_ip = getString(R.string.server_ip);
 
         sharedPreferences = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-        email = findViewById(R.id.email);
+        userId = findViewById(R.id.user_id);
         password = findViewById(R.id.password);
         loginState = findViewById(R.id.checkbox);
         login = findViewById(R.id.login);
         register = findViewById(R.id.register);
+
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
@@ -58,12 +62,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v)
             {
-                String txtEmail = email.getText().toString();
+                String txtUserId = userId.getText().toString();
                 String txtPassword = password.getText().toString();
-                if (TextUtils.isEmpty(txtEmail) || TextUtils.isEmpty(txtPassword)) {
+                if (TextUtils.isEmpty(txtUserId) || TextUtils.isEmpty(txtPassword)) {
                     Toast.makeText(MainActivity.this, "All fields required", Toast.LENGTH_SHORT).show();
                 } else {
-                    login(txtEmail, txtPassword);
+                    login(txtUserId, txtPassword);
                 }
             }
         });
@@ -75,14 +79,14 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void login(final String email, final String password) {
+    private void login(final String userId, final String password) {
         final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
         progressDialog.setCancelable(false);
         progressDialog.setIndeterminate(false);
         progressDialog.setTitle("Registering New Account");
         progressDialog.show();
 
-        String uRl = "http://15.164.50.236/loginregister/login.php";
+        String uRl = "http://"+ server_ip +"/loginregister/login.php";
         StringRequest request = new StringRequest(Request.Method.POST, uRl, new Response.Listener<String>() {
             @Override
             public void onResponse(String response)
@@ -117,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
             protected Map<String, String> getParams() throws AuthFailureError
             {
                 HashMap<String, String> param = new HashMap<>();
-                param.put("email", email);
+                param.put("userId", userId);
                 param.put("psw", password);
 
                 return param;
