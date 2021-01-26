@@ -12,7 +12,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Deardiary"
         android:usesCleartextTraffic="true">
-        <activity android:name=".DataInputActivity"/>
+        <activity android:name=".DiaryPostActivity"></activity>
+        <activity android:name=".DataInputActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
