@@ -72,10 +72,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //todo 로그인 유지 보류
         String loginStatus = sharedPreferences.getString(getResources().getString(R.string.prefLoginState), "");
-        if (loginStatus.equals("loggedin")) {
-            startActivity(new Intent(MainActivity.this, AppStartActivity.class));
-        }
+//        if (loginStatus.equals("loggedin")) {
+//            startActivity(new Intent(MainActivity.this, AppStartActivity.class));
+//        }
 
     }
 
@@ -102,7 +103,11 @@ public class MainActivity extends AppCompatActivity {
                         editor.putString(getResources().getString(R.string.prefLoginState), "loggedout");
                     }
                     editor.apply();
-                    startActivity(new Intent(MainActivity.this, AppStartActivity.class));
+
+                    Intent loginIntent = new Intent(MainActivity.this, AppStartActivity.class);
+                    loginIntent.putExtra("userId", userId);
+                    loginIntent.putExtra("password", password);
+                    startActivity(loginIntent);
                 }
 
                 else {

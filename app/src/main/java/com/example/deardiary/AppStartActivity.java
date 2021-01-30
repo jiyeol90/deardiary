@@ -15,19 +15,36 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.JsonRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class AppStartActivity extends AppCompatActivity {
 
-    Button logout;
+    private Button logout;
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle toggle;
     private Context context = this;
+
+    private String id;
+    private String pwd;
+    private String server_ip;
 
     private BottomNavigationView bottomNavigationView;
     private FragmentManager fragmentManager;
@@ -44,6 +61,23 @@ public class AppStartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_app_start);
 
+        //아이디와 패스워드를 전달받는다.
+        Intent userInfo = getIntent();
+        id = userInfo.getStringExtra("userId");
+        //pwd = userInfo.getStringExtra("password");
+
+        JSONObject requestJsonUserObject = new JSONObject();
+        try {
+            requestJsonUserObject.put("id", id);
+
+        } catch(JSONException e) {
+            e.printStackTrace();
+        }
+        server_ip = getString(R.string.server_ip);
+        String serverUrl = "http://"+ server_ip +"/loginregister/user_info.php";
+        //User 정보를 가져온다.
+        notifyUserInfo(requestJsonUserObject, serverUrl);
+
         accountFragment = new MyAccountFragment();
         homeFragment = new MyHomeFragment();
         noteFragment = new MyNoteFragment();
@@ -52,6 +86,9 @@ public class AppStartActivity extends AppCompatActivity {
         setFragment(0); //첫 프래그먼트 화면을 지정한다.
 
         bottomNavigationView = findViewById(R.id.bottomNavi);
+
+
+
 
         //BottomNavigation으로 fragment화면 전환
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -137,6 +174,43 @@ public class AppStartActivity extends AppCompatActivity {
                 return true;
             }
         });
+    }
+
+    private void notifyUserInfo(JSONObject requestJsonObject, String serverUrl) {
+        JsonObjectRequest jsonRequest= new JsonObjectRequest (Request.Method.POST, serverUrl, requestJsonObject,  new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                //Toast.makeText(AppStartActivity.this, response.toString(), Toast.LENGTH_SHORT).show();
+
+                if(!response.isNull("id")) {
+                    try {
+
+                        String index = response.getString("id");
+                        String userId = response.getString("user_id");
+                        String userName = response.getString("user_name");
+
+                        Log.i("id가져오기", "id : "+ index + " ,userid :" + userId + " , userName : " + userName);
+                        UserInfo userInfo = UserInfo.getInstance();
+                        userInfo.setIndex(index);
+                        userInfo.setId(userId);
+                        userInfo.setUserName(userName);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(context, "네트워크 연결 오류.", Toast.LENGTH_SHORT).show();
+                Log.i("VolleyError", "Volley Error in receiv");
+            }
+        });
+ ;
+        Volley.newRequestQueue(this).add(jsonRequest);
     }
 
     @Override

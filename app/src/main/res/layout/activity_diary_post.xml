@@ -44,23 +44,34 @@
         <com.rengwuxian.materialedittext.MaterialEditText
             android:id="@+id/diary_text"
             android:layout_width="match_parent"
-            android:layout_height="279dp"
+            android:layout_height="250dp"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="10dp"
             android:layout_marginRight="20dp"
             android:gravity="top"
             android:hint="일기를 써보세요."
+            app:met_floatingLabel="normal"
             android:padding="5dp"
-            android:background="@android:color/transparent"
-            android:textCursorDrawable="@drawable/text_cursor"
+            android:textColor="@color/colorPrimaryDark" />
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/diary_tag"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="20dp"
+            android:hint="#태그"
+            app:met_floatingLabel="normal"
+            android:padding="5dp"
             android:textColor="@color/colorPrimaryDark" />
 
         <Button
-            android:id="@+id/register"
+            android:id="@+id/post_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="115dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="55dp"
             android:background="@color/colorPrimaryDark"
             android:text="작성"
             android:textAllCaps="false"

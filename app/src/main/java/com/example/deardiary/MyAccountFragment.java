@@ -14,12 +14,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.TextView;
 
 
 public class MyAccountFragment extends Fragment {
 
     public static final int REQUEST_CODE = 100;
-    private Button btn;
+    private Button btn_post;
+    private TextView tv_post;
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -67,6 +69,7 @@ public class MyAccountFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+
         GridView gridView = view.findViewById(R.id.gv_diary_list);
         GridListAdapter adapter = new GridListAdapter();
 
@@ -112,14 +115,19 @@ public class MyAccountFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_my_account, container, false);
-        btn = rootView.findViewById(R.id.btn_diary_write);
+        btn_post = rootView.findViewById(R.id.btn_diary_write);
+        tv_post = rootView.findViewById(R.id.tv_diary_count);
 
-        btn.setOnClickListener(new View.OnClickListener() {
+        //tv_post.setText(UserInfo.getInstance().getPostCnt());
+
+
+        btn_post.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(),DataInputActivity.class);
-                startActivityForResult(intent,REQUEST_CODE);
-                //startActivity(intent);
+                Intent intent = new Intent(getActivity(),DiaryPostActivity.class);
+                //startActivityForResult(intent,REQUEST_CODE);
+                //결과값으로 가져올 데이터가 없으므로 새로운 인텐트를 띄어준다.
+                startActivity(intent);
             }
         });
         // Inflate the layout for this fragment
