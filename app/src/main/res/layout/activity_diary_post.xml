@@ -31,28 +31,29 @@
         <ImageView
             android:id="@+id/diary_image"
             android:layout_width="match_parent"
-            android:layout_height="204dp"
+            android:layout_height="276dp"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="10dp"
             android:layout_marginRight="20dp"
-            android:src="@drawable/ic_default_photo"
-            android:clickable="true"
             android:background="@drawable/round_border"
-            android:padding="5dp" />
+            android:clickable="true"
+            android:scaleType="centerCrop"
+            android:paddingVertical="15dp"
+            android:src="@drawable/ic_default_photo" />
 
 
         <com.rengwuxian.materialedittext.MaterialEditText
             android:id="@+id/diary_text"
             android:layout_width="match_parent"
-            android:layout_height="250dp"
+            android:layout_height="165dp"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="10dp"
             android:layout_marginRight="20dp"
             android:gravity="top"
             android:hint="일기를 써보세요."
-            app:met_floatingLabel="normal"
             android:padding="5dp"
-            android:textColor="@color/colorPrimaryDark" />
+            android:textColor="@color/colorPrimaryDark"
+            app:met_floatingLabel="normal" />
 
         <com.rengwuxian.materialedittext.MaterialEditText
             android:id="@+id/diary_tag"

@@ -26,6 +26,14 @@
         </activity>
         <activity android:name=".AppStartActivity" />
         <activity android:name=".RegisterActivity" />
+
+        <uses-library android:name="org.apache.http.legacy" android:required="false"/>
+        <!--
+        기능에 대해 android:required="true"를 선언하는 것은 기기에 지정된 기능이 없는 경우
+        플리케이션이 기능을 작동할 수 없거나 작동하도록 고안되지 않았음을 나타낸다.
+        android:required="false"를 선언하는 것은 기기에 지정된 기능이 있는 경우에는
+        애플리케이션이 기능을 사용하는 것을 선호하지만 필요한 경우 지정된 기능 없이 작동하도록 고안되었음을 의미
+        -->
     </application>
 
 </manifest>

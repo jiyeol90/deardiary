@@ -1,6 +1,7 @@
 package com.example.deardiary;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -26,13 +27,12 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.loader.content.CursorLoader;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+
+import com.android.volley.error.VolleyError;
+import com.android.volley.request.SimpleMultiPartRequest;
 import com.android.volley.toolbox.Volley;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.squareup.otto.Subscribe;
@@ -233,7 +233,7 @@ public class DiaryPostActivity extends AppCompatActivity {
         return byteArrayOutputStream.toByteArray();
     }
 
-    //todo 메소드 이름 수정
+    /*
     //포스팅 사진 업로드
     private void uploadBitmap(final Bitmap bitmap, final String content, final String tag, final String index) {
         VolleyMultipartRequest volleyMultipartRequest = new VolleyMultipartRequest(Request.Method.POST, ROOT_URL,
@@ -282,8 +282,43 @@ public class DiaryPostActivity extends AppCompatActivity {
         //adding the request to volley
         Volley.newRequestQueue(this).add(volleyMultipartRequest);
     }
+*/
 
 
+    private void uploadBitmap(final Bitmap bitmap, final String content, final String tag, final String index) {
+        SimpleMultiPartRequest smpr= new SimpleMultiPartRequest(Request.Method.POST, ROOT_URL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                //new AlertDialog.Builder(DiaryPostActivity.this).setMessage("응답:"+response).create().show();
+
+                try {
+                    JSONObject obj = new JSONObject(response);
+                    Toast.makeText(getApplicationContext(), obj.getString("message"), Toast.LENGTH_SHORT).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                finish();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+        //요청 객체에 보낼 데이터를 추가
+        smpr.addStringParam("content", content);
+        smpr.addStringParam("tag", tag);
+        smpr.addStringParam("index", index);
+        //이미지 파일 추가
+        smpr.addFile("image", filePath);
+
+        //요청객체를 서버로 보낼 우체통 같은 객체 생성
+        RequestQueue requestQueue= Volley.newRequestQueue(this);
+        requestQueue.add(smpr);
+
+    }
 
     //사진의 회전값 가져오기 - 회전값을 처리하지 않으면 사진을 찍은 방향대로 이미지뷰에 처리되지 않는다.
     private int exifOrientationToDegrees(int exifOrientation) {
