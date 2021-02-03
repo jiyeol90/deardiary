@@ -2,17 +2,14 @@ package com.example.deardiary;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -34,13 +31,13 @@ public class MyHomeFragment extends Fragment {
 
     ArrayList<PostItem> items= new ArrayList<>();
 
-    ItemAdapter adapter;
+    PostAdapter adapter;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         recyclerView= view.findViewById(R.id.recycler);
-        adapter= new ItemAdapter(getActivity(), items);
+        adapter= new PostAdapter(getActivity(), items);
 
         // Inflate the layout for this fragment
 
@@ -62,8 +59,8 @@ public class MyHomeFragment extends Fragment {
 
                 //파라미터로 응답받은 결과 JsonArray를 분석
 
-//                items.clear();
-//                adapter.notifyDataSetChanged();
+                items.clear();
+                adapter.notifyDataSetChanged();
                 try {
 
                     for(int i=0;i<response.length();i++){
@@ -71,14 +68,14 @@ public class MyHomeFragment extends Fragment {
 
                         String no= jsonObject.getString("id"); //no가 문자열이라서 바꿔야함.
                         String name=jsonObject.getString("user_id");
-                        String msg=jsonObject.getString("text_content");
+                        //String msg=jsonObject.getString("text_content");
                         String imgPath=jsonObject.getString("img_src");
                         String date=jsonObject.getString("created_date");
 
                         //이미지 경로의 경우 서버 IP가 제외된 주소이므로(uploads/xxxx.jpg) 바로 사용 불가.
                         imgPath = "http://3.36.92.185"+imgPath;
 
-                        items.add(0, new PostItem(no, name, msg, imgPath, date)); // 첫 번째 매개변수는 몇번째에 추가 될지, 제일 위에 오도록
+                        items.add(0, new PostItem(no, name,  imgPath, date)); // 첫 번째 매개변수는 몇번째에 추가 될지, 제일 위에 오도록
                         //adapter.notifyDataSetChanged();
                         adapter.notifyItemInserted(0);
                     }

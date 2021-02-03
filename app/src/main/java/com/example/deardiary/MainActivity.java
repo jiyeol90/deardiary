@@ -1,4 +1,5 @@
 package com.example.deardiary;
+import android.util.Log;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -21,6 +22,10 @@ import com.android.volley.error.VolleyError;
 import com.android.volley.request.StringRequest;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
     Button login, register;
     CheckBox loginState;
     SharedPreferences sharedPreferences;
-
     //AWS EC2에 Elastic IP를 설정하지 않았기 때문에(유료) 서버를 재부팅 할때마다 IP주소가 바뀌어서 리소스 외부화를 해주었다.
     String server_ip;
 
@@ -92,9 +96,32 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(String response)
             {
-                if (response.equals("Login Success")) {
+                try {
+                    JSONArray resJsonArray = new JSONArray(response);
+
+                if (resJsonArray.length() != 0) {
                     progressDialog.dismiss();
                     Toast.makeText(MainActivity.this, response, Toast.LENGTH_SHORT).show();
+                    for(int i=0; i<resJsonArray.length(); i++) {
+                        JSONObject jsonObject = resJsonArray.getJSONObject(i);
+
+                        String index = jsonObject.getString("id");
+                        String userId = jsonObject.getString("user_id");
+                        String  userName = jsonObject.getString("user_name");
+
+                        Log.i("id가져오기", "id : "+ index + " ,userid :" + userId + " , userName : " + userName);
+                        UserInfo userInfo = UserInfo.getInstance();
+                        userInfo.setIndex(index);
+                        userInfo.setId(userId);
+                        userInfo.setUserName(userName);
+                        /*
+                        "id": "1",
+                        "user_id": "james",
+                        "user_name": "\uc724\uc9c0\uc5f4"
+                         */
+                    }
+
+
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     if (loginState.isChecked()) {
                         editor.putString(getResources().getString(R.string.prefLoginState), "loggedin");
@@ -104,16 +131,17 @@ public class MainActivity extends AppCompatActivity {
                     }
                     editor.apply();
 
-                    Intent loginIntent = new Intent(MainActivity.this, AppStartActivity.class);
-                    loginIntent.putExtra("userId", userId);
-                    loginIntent.putExtra("password", password);
-                    startActivity(loginIntent);
+                    Intent appStartIntent = new Intent(MainActivity.this, AppStartActivity.class);
+                    appStartIntent.putExtra("userId", userId);
+                    appStartIntent.putExtra("password", password);
+                    startActivity(appStartIntent);
                 }
 
                 else {
                     progressDialog.dismiss();
                     Toast.makeText(MainActivity.this, response, Toast.LENGTH_SHORT).show();
                 }
+                }catch (JSONException e) {e.printStackTrace();}
             }
         }, new Response.ErrorListener() {
             @Override

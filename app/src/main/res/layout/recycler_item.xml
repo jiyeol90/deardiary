@@ -43,28 +43,55 @@
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"/>
 
-        <TextView
-            android:id="@+id/tv_msg"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="this is message"
-            android:textColor="#888888"
-            android:textStyle="bold"
-            android:layout_below="@+id/tv_name"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="8dp"/>
+
 
         <ImageView
             android:id="@+id/iv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:src="@mipmap/ic_launcher"
-            android:layout_below="@id/tv_msg"
+            android:layout_below="@+id/tv_name"
             android:adjustViewBounds="true"
-            android:maxHeight="600dp"
+            android:maxHeight="500dp"
             android:layout_marginTop="8dp"/>
         <!--        android:adjustViewBounds="true" 뷰 사이즈로 이미지를 키워줌, 그리고 이미지 비율을 유지하며 맞춤-->
         <!--        android:maxHeight="600dp 는 adjustViewBounds 써야 유효하다. -->
+
+
+        <ImageView
+            android:id="@+id/iv_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/iv"
+            android:gravity="right"
+            android:layout_marginVertical="15dp"
+            android:layout_marginLeft="250dp"
+            android:src="@drawable/ic_view_post" />
+
+        <TextView
+            android:id="@+id/tv_viewCnt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textColor="#888888"
+            android:textStyle="bold"
+            android:layout_below="@+id/iv"
+            android:layout_toRightOf="@+id/iv_view"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="16dp"/>
+        <ToggleButton
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:background="@drawable/ic_heart_border"
+            android:checked = "false"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="20dp"
+            android:layout_below="@id/iv"
+            android:layout_toRightOf="@id/tv_viewCnt"
+            android:text=""
+            android:textOff=""
+            android:textOn=""/>
+
     </RelativeLayout>
 
 </androidx.cardview.widget.CardView>

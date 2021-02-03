@@ -38,7 +38,7 @@
             android:background="@drawable/round_border"
             android:clickable="true"
             android:scaleType="centerCrop"
-            android:paddingVertical="15dp"
+            android:paddingVertical="30dp"
             android:src="@drawable/ic_default_photo" />
 
 

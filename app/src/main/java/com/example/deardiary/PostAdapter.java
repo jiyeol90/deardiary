@@ -14,12 +14,12 @@ import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
-public class ItemAdapter extends RecyclerView.Adapter {
+public class PostAdapter extends RecyclerView.Adapter {
 
     Context context;
     ArrayList<PostItem> items;
 
-    public ItemAdapter(Context context, ArrayList<PostItem> items) {
+    public PostAdapter(Context context, ArrayList<PostItem> items) {
         this.context = context;
         this.items = items;
     }
@@ -42,8 +42,7 @@ public class ItemAdapter extends RecyclerView.Adapter {
         PostItem item= items.get(position);
         vh.tvName.setText(item.getName());
         vh.tvDate.setText(item.getDate());
-        vh.tvMsg.setText(item.getMsg());
-
+        //vh.tvMsg.setText(item.getMsg());
         Glide.with(holder.itemView.getContext()).load(item.getImgPath()).into(vh.iv);
     }
 
@@ -64,7 +63,7 @@ public class ItemAdapter extends RecyclerView.Adapter {
 
             tvName=itemView.findViewById(R.id.tv_name);
             tvDate=itemView.findViewById(R.id.tv_date);
-            tvMsg=itemView.findViewById(R.id.tv_msg);
+            //tvMsg=itemView.findViewById(R.id.tv_msg);
             iv=itemView.findViewById(R.id.iv);
 
         }

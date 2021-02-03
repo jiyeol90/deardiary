@@ -1,20 +1,21 @@
 package com.example.deardiary;
 
+//포스팅을 연속적으로 보여줄때의 데이터값들
 public class PostItem {
 
     String no;
     String name;
-    String msg;
+   //String msg;
     String imgPath;
     String date;
 
     public PostItem() {
     }
 
-    public PostItem(String no, String name, String msg, String imgPath, String date) {
+    public PostItem(String no, String name,  String imgPath, String date) {
         this.no = no;
         this.name = name;
-        this.msg = msg;
+        //this.msg = msg;
         this.imgPath = imgPath;
         this.date = date;
     }
@@ -35,13 +36,13 @@ public class PostItem {
         this.name = name;
     }
 
-    public String getMsg() {
-        return msg;
-    }
-
-    public void setMsg(String msg) {
-        this.msg = msg;
-    }
+//    public String getMsg() {
+//        return msg;
+//    }
+//
+//    public void setMsg(String msg) {
+//        this.msg = msg;
+//    }
 
     public String getImgPath() {
         return imgPath;

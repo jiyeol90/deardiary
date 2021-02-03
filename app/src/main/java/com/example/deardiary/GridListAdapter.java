@@ -2,56 +2,73 @@ package com.example.deardiary;
 
 
 import android.content.Context;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
-public class GridListAdapter extends BaseAdapter {
-    ArrayList<ListItem> items = new ArrayList<ListItem>();
-    Context context;
+public class GridListAdapter extends RecyclerView.Adapter {
 
-    public void addItem(ListItem item) {
-        items.add(item);
+    Context context;
+    ArrayList<GridListItem> items;
+
+    public GridListAdapter(Context context, ArrayList<GridListItem> items) {
+        this.context = context;
+        this.items = items;
+    }
+    @NonNull
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater inflater= LayoutInflater.from(parent.getContext());
+
+        View itemView=inflater.inflate(R.layout.grid_list_item,parent,false);
+
+        VH holder=new VH(itemView);
+        return holder;
     }
 
     @Override
-    public int getCount() {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        VH vh= (VH) holder;
+
+        GridListItem item= items.get(position);
+        vh.dateInfo.setText(item.getDate());
+        Glide.with(holder.itemView.getContext()).load(item.getImgPath()).override(200, 190).into(vh.thumbnail);
+    }
+
+    @Override
+    public int getItemCount() {
         return items.size();
     }
 
-    @Override
-    public Object getItem(int position) {
-        return items.get(position);
-    }
+    class VH extends RecyclerView.ViewHolder{
 
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
+        RoundImageView  thumbnail;
+        TextView dateInfo;
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        context = parent.getContext();
-       ListItem listItem = items.get(position);
+        public VH(@NonNull View itemView) {
+            super(itemView);
 
-        if(convertView == null) {
-            LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.list_item, parent, false);
+            thumbnail=itemView.findViewById(R.id.iv_post);
+            thumbnail.setRectRadius(20f);
+            dateInfo=itemView.findViewById(R.id.date_text);
+
+
         }
-
-        TextView nameText = convertView.findViewById(R.id.name_text);
-        TextView numberText = convertView.findViewById(R.id.number_text);
-
-        nameText.setText(listItem.getName());
-        numberText.setText(listItem.getNumber());
-
-        return convertView;
     }
 }
+
 
 
 

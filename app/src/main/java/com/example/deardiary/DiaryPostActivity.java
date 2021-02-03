@@ -146,6 +146,7 @@ public class DiaryPostActivity extends AppCompatActivity {
             Uri picUri = data.getData();
             //ex) content://media/external/images/media/2874
             filePath = getRealPathFromUri(picUri);
+            Log.i("filePath: " , filePath);
             //ex) /storage/emulated/0/DCIM/Camera/20210122_011008.jpg
             ExifInterface exif = null;
             if (filePath != null) {

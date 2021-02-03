@@ -7,8 +7,8 @@
     tools:context=".MyAccountFragment">
 
 
-    <ImageView
-        android:id="@+id/imagePorfile"
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/iv_profile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_profile_default"
@@ -76,7 +76,7 @@
         app:layout_constraintBottom_toTopOf="@+id/view_line"
         app:layout_constraintEnd_toStartOf="@+id/btn_diary_write"
         app:layout_constraintHorizontal_bias="0.403"
-        app:layout_constraintStart_toEndOf="@+id/imagePorfile"
+        app:layout_constraintStart_toEndOf="@+id/iv_profile"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.901" />
 
@@ -103,8 +103,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.316" />
 
-    <GridView
-        android:id="@+id/gv_diary_list"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/grid_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="10dp"

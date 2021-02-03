@@ -72,8 +72,8 @@ public class AppStartActivity extends AppCompatActivity {
         }
         server_ip = getString(R.string.server_ip);
         String serverUrl = "http://"+ server_ip +"/loginregister/user_info.php";
-        //User 정보를 가져온다.
-        notifyUserInfo(requestJsonUserObject, serverUrl);
+        //Todo 위치를 MainActivity로 옮겨준다.
+        //notifyUserInfo(requestJsonUserObject, serverUrl);
 
         accountFragment = new MyAccountFragment();
         homeFragment = new MyHomeFragment();
@@ -83,9 +83,6 @@ public class AppStartActivity extends AppCompatActivity {
         setFragment(0); //첫 프래그먼트 화면을 지정한다.
 
         bottomNavigationView = findViewById(R.id.bottomNavi);
-
-
-
 
         //BottomNavigation으로 fragment화면 전환
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -229,7 +226,7 @@ public class AppStartActivity extends AppCompatActivity {
         switch (index) {
 
             case 0:
-                fragmentTransaction.replace(R.id.main_frame, MyAccountFragment.newInstance("파라미터1", "파라미터2"));
+                fragmentTransaction.replace(R.id.main_frame, accountFragment);
                 fragmentTransaction.commit();
                 break;
 
