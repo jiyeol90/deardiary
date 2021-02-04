@@ -20,6 +20,21 @@
         app:layout_constraintVertical_bias="0.474" />
 
     <TextView
+        android:id="@+id/profile_text"
+        android:layout_width="135dp"
+        android:layout_height="40dp"
+        android:layout_marginBottom="16dp"
+        android:text="소개를 입력하세요."
+        android:textStyle="bold"
+        android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@+id/view_line"
+        app:layout_constraintEnd_toStartOf="@+id/btn_profile_edit"
+        app:layout_constraintHorizontal_bias="0.62"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.994" />
+
+    <TextView
         android:id="@+id/diary_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -37,19 +52,19 @@
         android:id="@+id/friends_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="88dp"
+        android:layout_marginEnd="84dp"
         android:text="친구"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/tv_friends_count"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.812" />
+        app:layout_constraintVertical_bias="0.792" />
 
     <TextView
         android:id="@+id/tv_friends_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="96dp"
+        android:layout_marginEnd="84dp"
         android:layout_marginBottom="32dp"
         android:text="0"
         android:textSize="30dp"
@@ -75,7 +90,7 @@
         android:text="프로필"
         app:layout_constraintBottom_toTopOf="@+id/view_line"
         app:layout_constraintEnd_toStartOf="@+id/btn_diary_write"
-        app:layout_constraintHorizontal_bias="0.403"
+        app:layout_constraintHorizontal_bias="0.645"
         app:layout_constraintStart_toEndOf="@+id/iv_profile"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.901" />
@@ -84,7 +99,7 @@
         android:id="@+id/btn_diary_write"
         android:layout_width="100dp"
         android:layout_height="38dp"
-        android:layout_marginEnd="44dp"
+        android:layout_marginEnd="24dp"
         android:text="일기쓰기"
         app:layout_constraintBottom_toTopOf="@+id/view_line"
         app:layout_constraintEnd_toEndOf="parent"

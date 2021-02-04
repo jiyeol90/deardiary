@@ -1,15 +1,12 @@
 package com.example.deardiary;
 
 import android.Manifest;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.VectorDrawable;
 import android.media.ExifInterface;
 import android.net.Uri;
@@ -35,16 +32,12 @@ import com.android.volley.error.VolleyError;
 import com.android.volley.request.SimpleMultiPartRequest;
 import com.android.volley.toolbox.Volley;
 import com.rengwuxian.materialedittext.MaterialEditText;
-import com.squareup.otto.Subscribe;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 public class DiaryPostActivity extends AppCompatActivity {
 
@@ -60,7 +53,7 @@ public class DiaryPostActivity extends AppCompatActivity {
     String filePath;
     String textContent = "";
     String tag = "";
-    String userIndex; // user아이디가 아닌 mysql user테이블의 index.
+    String userId; // user아이디가
 
 
     ImageView diaryImage;
@@ -111,7 +104,7 @@ public class DiaryPostActivity extends AppCompatActivity {
             public void onClick(View v) {
                 textContent = diaryText.getText().toString();
                 tag = diaryTag.getText().toString();
-                userIndex = UserInfo.getInstance().getIndex();
+                userId = UserInfo.getInstance().getId();
 
                 Log.i("정보태그", "textContent : " + textContent + ", tag : " + tag);
 
@@ -121,7 +114,7 @@ public class DiaryPostActivity extends AppCompatActivity {
                 } else if (TextUtils.isEmpty(textContent)) {
                     Toast.makeText(getApplicationContext(), "일기를 등록하세요.",Toast.LENGTH_SHORT).show();
                 } else {
-                    uploadBitmap(bitmap, textContent, tag, userIndex);
+                    uploadBitmap(bitmap, textContent, tag, userId);
                 }
             }
         });
@@ -286,12 +279,13 @@ public class DiaryPostActivity extends AppCompatActivity {
 */
 
 
-    private void uploadBitmap(final Bitmap bitmap, final String content, final String tag, final String index) {
+    private void uploadBitmap(final Bitmap bitmap, final String content, final String tag, final String userId) {
         SimpleMultiPartRequest smpr= new SimpleMultiPartRequest(Request.Method.POST, ROOT_URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 //new AlertDialog.Builder(DiaryPostActivity.this).setMessage("응답:"+response).create().show();
-
+                //데이를 보낼 곳에 Boolean 값을 준다.
+                BusProvider.getInstance().post(new BusEvent(true));
                 try {
                     JSONObject obj = new JSONObject(response);
                     Toast.makeText(getApplicationContext(), obj.getString("message"), Toast.LENGTH_SHORT).show();
@@ -311,7 +305,7 @@ public class DiaryPostActivity extends AppCompatActivity {
         //요청 객체에 보낼 데이터를 추가
         smpr.addStringParam("content", content);
         smpr.addStringParam("tag", tag);
-        smpr.addStringParam("index", index);
+        smpr.addStringParam("userId", userId);
         //이미지 파일 추가
         smpr.addFile("image", filePath);
 

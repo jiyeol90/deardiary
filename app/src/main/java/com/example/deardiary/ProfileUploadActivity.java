@@ -1,28 +1,25 @@
 package com.example.deardiary;
+import android.text.TextUtils;
+import android.widget.EditText;
+
+import com.bumptech.glide.Glide;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.drawable.VectorDrawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
-import androidx.loader.content.CursorLoader;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -44,6 +41,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class ProfileUploadActivity extends AppCompatActivity implements Button.OnClickListener {
 
     private static final String ROOT_URL = "http://3.36.92.185/uploads/profile_upload.php";
@@ -53,22 +52,20 @@ public class ProfileUploadActivity extends AppCompatActivity implements Button.O
 
 
     private Uri mImageCaptureUri;
-
-    private ImageView iv_UserPhoto;
-
+    private CircleImageView iv_UserPhoto;
     private Button btn_upload;
-
     private Button btn_save;
+    private EditText et_profileText;
 
-
-    private int id_view;
-
+    private String profileSrc;
+    private String profileText;
     private String absoultePath;
 
     private File photoFile;
     private String imageFilePath;
     private Uri photoUri;
-    String userIndex; // user아이디가 아닌 mysql user테이블의 index.
+    String userId;
+    String userText;
 
     @Override
 
@@ -77,6 +74,7 @@ public class ProfileUploadActivity extends AppCompatActivity implements Button.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_upload);
 
+        //권한 설정
         TedPermission.with(this)
                 .setPermissionListener(new PermissionListener() {
                     @Override
@@ -95,9 +93,20 @@ public class ProfileUploadActivity extends AppCompatActivity implements Button.O
                 .check();
 
 
-        iv_UserPhoto = (ImageView) this.findViewById(R.id.user_image);
-        Button btn_upload = (Button) this.findViewById(R.id.btn_UploadPicture);
-        Button btn_save = (Button) this.findViewById(R.id.btn_SavePicture);
+        iv_UserPhoto = (CircleImageView) this.findViewById(R.id.user_image);
+        btn_upload = (Button) this.findViewById(R.id.btn_UploadPicture);
+        btn_save = (Button) this.findViewById(R.id.btn_savePicture);
+        et_profileText = (EditText) this.findViewById(R.id.et_profileText);
+
+        profileSrc = UserInfo.getInstance().getUserProfile();
+        profileText = UserInfo.getInstance().getUserText();
+        if(!profileSrc.equals("")) {
+            //이미지 url이 있으면 호출한다.
+            Glide.with(this).load("http://3.36.92.185"+profileSrc).into(iv_UserPhoto);
+        }
+        if(!profileSrc.equals("")) {
+            et_profileText.setText(profileText);
+        }
 
         btn_upload.setOnClickListener(this);
         btn_save.setOnClickListener(this);
@@ -277,7 +286,7 @@ public class ProfileUploadActivity extends AppCompatActivity implements Button.O
 
                     absoultePath = filePath;
                     Log.i("경로 in OnActivityResult", filePath);
-
+                    btn_save.setVisibility(View.VISIBLE);
                     break;
 
 
@@ -306,46 +315,6 @@ public class ProfileUploadActivity extends AppCompatActivity implements Button.O
 
     @Override
     public void onClick(View v) {
-        //DBinsert처리
-        id_view = v.getId();
-//
-//        if(v.getId() == R.id.btn_signupfinish) {
-//
-//            /** SharedPreference 환경 변수 사용 **/
-//
-//            SharedPreferences prefs = getSharedPreferences("login", 0);
-//
-//            /** prefs.getString() return값이 null이라면 2번째 함수를 대입한다. **/
-//
-//            String login = prefs.getString("USER_LOGIN", "LOGOUT");
-//
-//            String facebook_login = prefs.getString("FACEBOOK_LOGIN", "LOGOUT");
-//
-//            String user_id = prefs.getString("USER_ID","");
-//
-//            String user_name = prefs.getString("USER_NAME", "");
-//
-//            String user_password = prefs.getString("USER_PASSWORD", "");
-//
-//            String user_phone = prefs.getString("USER_PHONE", "");
-//
-//            String user_email = prefs.getString("USER_EMAIL", "");
-//
-//            dbmanger.select(user_id,user_name,user_password, user_phone, user_email);
-//
-//            dbmanger.selectPhoto(user_name, mImageCaptureUri, absoultePath);
-//
-//
-//            Intent mainIntent = new Intent(SignUpPhotoActivity.this, LoginActivity.class);
-//
-//            SignUpPhotoActivity.this.startActivity(mainIntent);
-//
-//            SignUpPhotoActivity.this.finish();
-//
-//            Toast.makeText(this, "회원가입이 완료되었습니다.", Toast.LENGTH_SHORT).show();
-//
-//
-//        }else
 
         if(v.getId() == R.id.btn_UploadPicture) {
 
@@ -399,24 +368,33 @@ public class ProfileUploadActivity extends AppCompatActivity implements Button.O
 
                     .show();
 
-        }else if (v.getId() == R.id.btn_SavePicture) {
+        }else if (v.getId() == R.id.btn_savePicture) {
+            if(iv_UserPhoto.getDrawable() instanceof VectorDrawable) {
+                Toast.makeText(getApplicationContext(), "이미지를 등록하세요.", Toast.LENGTH_SHORT).show();
+            } else {
+                userId = UserInfo.getInstance().getId();
+                userText = et_profileText.getText().toString();
 
-            userIndex = UserInfo.getInstance().getIndex();
-            savePicture(userIndex);
+                Log.i("data : ", userText);
+                savePicture(userId, userText);
+            }
         }
 
     }
 
-    private void savePicture(String index) {
+    private void savePicture(String userId, String userText) {
 
             SimpleMultiPartRequest smpr= new SimpleMultiPartRequest(Request.Method.POST, ROOT_URL, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                     //new AlertDialog.Builder(DiaryPostActivity.this).setMessage("응답:"+response).create().show();
-
+                    //이벤트 버스를 송신한다.
+                    BusProvider.getInstance().post(new BusEvent(true));
                     try {
                         JSONObject obj = new JSONObject(response);
                         Toast.makeText(getApplicationContext(), obj.getString("message"), Toast.LENGTH_SHORT).show();
+
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -432,9 +410,13 @@ public class ProfileUploadActivity extends AppCompatActivity implements Button.O
 
             //요청 객체에 보낼 데이터를 추가
 
-            smpr.addStringParam("index", index);
+            smpr.addStringParam("userId", userId);
+            smpr.addStringParam("userText", userText);
             //이미지 파일 추가
-            smpr.addFile("image", absoultePath);
+            //기존 이미지를 저장하기 누른다면 따로 저장해줄 필요가 없다.
+            if(!TextUtils.isEmpty(absoultePath)) {
+                smpr.addFile("image", absoultePath);
+            }
 
             //요청객체를 서버로 보낼 우체통 같은 객체 생성
             RequestQueue requestQueue= Volley.newRequestQueue(this);

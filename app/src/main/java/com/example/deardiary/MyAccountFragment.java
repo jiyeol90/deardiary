@@ -31,6 +31,8 @@ import com.android.volley.error.VolleyError;
 import com.android.volley.request.JsonArrayRequest;
 import com.android.volley.request.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
+import com.squareup.otto.Subscribe;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,6 +52,7 @@ public class MyAccountFragment extends Fragment {
     public static final int REQUEST_CODE = 100;
     private Button btn_post;
     private TextView tv_postCnt;
+    private TextView tv_profileText;
     private CircleImageView iv_profile;
     private Button btn_profile;
     private ImageView iv_post;
@@ -63,10 +66,18 @@ public class MyAccountFragment extends Fragment {
     GridListAdapter adapter;
 
 
+    //이벤트 버스 등록
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d("생명주기 :", "onCreate()");
+        BusProvider.getInstance().register(this);
+    }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        Log.d("생명주기 :", "onViewCreated()");
         rcv_grid = view.findViewById(R.id.grid_view);
 
 
@@ -93,6 +104,13 @@ public class MyAccountFragment extends Fragment {
         loadPage();
 
     }
+    //데이터를 받을 메서드
+    @Subscribe
+    public void busStop(BusEvent busEvent) {//public항상 붙여줘야함
+        if(busEvent.isFlag()) {
+            loadPage();
+        }
+    }
 
     private void loadPage() {
 
@@ -108,37 +126,80 @@ public class MyAccountFragment extends Fragment {
             //volley 라이브러리의 GET방식은 버튼 누를때마다 새로운 갱신 데이터를 불러들이지 않음. 그래서 POST 방식 사용
             @Override
             public void onResponse(String response) {
-
-                Toast.makeText(getActivity(), response.toString(), Toast.LENGTH_SHORT).show();
+                progressDialog.dismiss();
+                //Toast.makeText(getActivity(), response.toString(), Toast.LENGTH_SHORT).show();
                 //파라미터로 응답받은 결과 JsonArray를 분석
 
                 items.clear();
                 adapter.notifyDataSetChanged();
                 try {
                     JSONArray resJsonArray = new JSONArray(response);
-                    for(int i=0; i<resJsonArray.length(); i++){
-                        JSONObject jsonObject= resJsonArray.getJSONObject(i);
+                    Log.i("resJsonArray", Integer.toString(resJsonArray.length()));
 
-                        //String no= jsonObject.getString("id"); //no가 문자열이라서 바꿔야함.
-                        // String name=jsonObject.getString("user_id");
+                    JSONObject upperMypage = resJsonArray.getJSONObject(0);
+                    String imageSrc = upperMypage.getString("user_profile");
+                    String profileText = upperMypage.getString("user_text");
+                    String cnt = upperMypage.getString("postCnt");
+                    Log.i("포스팅 개수", cnt);
 
-                        String imgPath=jsonObject.getString("img_src");
-                        String date=jsonObject.getString("created_date").substring(0,10); // 2021-02-01 14:44:01 에서 년 월 일만 띄어준다.
+                    /*
+                     * 기본이미지일 경우의 response 값 ("default")
+                     * 프로필 문구만 입력되어있는 경우 response값 (null)
+                     * DB조회를 할때 ueser 테이블에서 프로필 이미지의 url (user_profile) 과 프로필 문구 (user_text) 컬럼을 select 하기 때문에 처리해 줘야 한다.
+                     */
+                    if(!imageSrc.equals("default") || !imageSrc.equals("null")) {
 
+                        //UserInfo 객체에 이미지 경로 필드에 저장한다.
+                        UserInfo.getInstance().setUserProfile(imageSrc);
+                        //서버에서 저장된 이미지 url
+                        imageSrc = "http://3.36.92.185"+imageSrc;
+                        Glide.with(MyAccountFragment.this).load(imageSrc).into(iv_profile);
+                    }
+                    if(!profileText.equals("default") && !profileText.equals("null")) {
 
-                        //이미지 경로의 경우 서버 IP가 제외된 주소이므로(uploads/xxxx.jpg) 바로 사용 불가.
+                        UserInfo.getInstance().setUserText(profileText);
+                        //상태메시지 입력
+                        tv_profileText.setText(profileText);
+                    }
+
+                    tv_postCnt.setText(cnt);
+
+                    JSONArray postArray = resJsonArray.getJSONArray(1);
+                    Log.i("postArray 수", Integer.toString(postArray.length()));
+                    for(int i=0; i<postArray.length(); i++) {
+                        JSONObject post = postArray.getJSONObject(i);
+                        String postId = post.getString("id");
+                        String imgPath= post.getString("img_src");
+                        String date= post.getString("created_date").substring(0,10);
+
                         imgPath = "http://3.36.92.185"+imgPath;
-
-                        items.add(0, new GridListItem(imgPath, date)); // 첫 번째 매개변수는 몇번째에 추가 될지, 제일 위에 오도록
-                        //adapter.notifyDataSetChanged();
+                        items.add(0, new GridListItem(postId, imgPath, date));
                         adapter.notifyItemInserted(0);
 
                     }
+//                    for(int i=0; i<resJsonArray.length(); i++){
+//                        JSONObject jsonObject= resJsonArray.getJSONObject(i);
+//
+//                        //String no= jsonObject.getString("id"); //no가 문자열이라서 바꿔야함.
+//                        // String name=jsonObject.getString("user_id");
+//
+//                        String imgPath=jsonObject.getString("img_src");
+//                        String date=jsonObject.getString("created_date").substring(0,10); // 2021-02-01 14:44:01 에서 년 월 일만 띄어준다.
+//
+//
+//                        //이미지 경로의 경우 서버 IP가 제외된 주소이므로(uploads/xxxx.jpg) 바로 사용 불가.
+//                        imgPath = "http://3.36.92.185"+imgPath;
+//
+//                        items.add(0, new GridListItem(imgPath, date)); // 첫 번째 매개변수는 몇번째에 추가 될지, 제일 위에 오도록
+//                        //adapter.notifyDataSetChanged();
+//                        adapter.notifyItemInserted(0);
+//
+//                    }
                     //리사이클러뷰의 레이아웃 매니저 설정
                     layoutManager= new GridLayoutManager(getActivity(),3);
                     rcv_grid.setLayoutManager(layoutManager);
 
-                    progressDialog.dismiss();
+
                 } catch (JSONException e) {e.printStackTrace();}
 
             }
@@ -154,9 +215,9 @@ public class MyAccountFragment extends Fragment {
             {
                 HashMap<String, String> param = new HashMap<>();
 
-                String index = UserInfo.getInstance().getIndex();
-                Log.d("index값", index);
-                param.put("index", index);
+                String userId = UserInfo.getInstance().getId();
+                Log.d("index값", userId);
+                param.put("userId", userId);
 
                 return param;
             }
@@ -182,16 +243,24 @@ public class MyAccountFragment extends Fragment {
         }
     }
 
+    //이벤트버스 등록해제
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        BusProvider.getInstance().unregister(this);
+        Log.d("생명주기 :", "onDestroy()");
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d("생명주기 :", "onCreateView()");
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_my_account, container, false);
         btn_post = rootView.findViewById(R.id.btn_diary_write);
         btn_profile = rootView.findViewById(R.id.btn_profile_edit);
         tv_postCnt = rootView.findViewById(R.id.tv_diary_count);
         iv_profile = rootView.findViewById(R.id.iv_profile);
-
+        tv_profileText = rootView.findViewById(R.id.profile_text);
 
         //포스팅 버튼
         btn_post.setOnClickListener(new View.OnClickListener() {
@@ -203,7 +272,7 @@ public class MyAccountFragment extends Fragment {
                 startActivity(intent);
             }
         });
-        // Inflate the layout for this fragment
+        // 프로필 사진 업로드
         btn_profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -216,4 +285,6 @@ public class MyAccountFragment extends Fragment {
 
         return rootView;
     }
+
+
 }

@@ -44,7 +44,7 @@ public class GridListAdapter extends RecyclerView.Adapter {
 
         GridListItem item= items.get(position);
         vh.dateInfo.setText(item.getDate());
-        Glide.with(holder.itemView.getContext()).load(item.getImgPath()).override(200, 190).into(vh.thumbnail);
+        Glide.with(holder.itemView.getContext()).load(item.getImgPath()).override(200, 190).placeholder(R.drawable.ic_default_photo).into(vh.thumbnail);
     }
 
     @Override

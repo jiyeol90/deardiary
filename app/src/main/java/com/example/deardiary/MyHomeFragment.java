@@ -54,7 +54,7 @@ public class MyHomeFragment extends Fragment {
             //volley 라이브러리의 GET방식은 버튼 누를때마다 새로운 갱신 데이터를 불러들이지 않음. 그래서 POST 방식 사용
             @Override
             public void onResponse(JSONArray response) {
-                Toast.makeText(getActivity(), response.toString(), Toast.LENGTH_SHORT).show();
+               // Toast.makeText(getActivity(), response.toString(), Toast.LENGTH_SHORT).show();
 
 
                 //파라미터로 응답받은 결과 JsonArray를 분석

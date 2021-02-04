@@ -60,16 +60,16 @@ public class AppStartActivity extends AppCompatActivity {
 
         //아이디와 패스워드를 전달받는다.
         Intent userInfo = getIntent();
-        id = userInfo.getStringExtra("userId");
+//        id = userInfo.getStringExtra("userId");
         //pwd = userInfo.getStringExtra("password");
 
-        JSONObject requestJsonUserObject = new JSONObject();
-        try {
-            requestJsonUserObject.put("id", id);
-
-        } catch(JSONException e) {
-            e.printStackTrace();
-        }
+//        JSONObject requestJsonUserObject = new JSONObject();
+//        try {
+//            requestJsonUserObject.put("id", id);
+//
+//        } catch(JSONException e) {
+//            e.printStackTrace();
+//        }
         server_ip = getString(R.string.server_ip);
         String serverUrl = "http://"+ server_ip +"/loginregister/user_info.php";
         //Todo 위치를 MainActivity로 옮겨준다.
@@ -247,6 +247,5 @@ public class AppStartActivity extends AppCompatActivity {
 
         }
     }
-
 
 }

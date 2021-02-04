@@ -43,9 +43,8 @@ public class MainActivity extends AppCompatActivity {
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         server_ip = getString(R.string.server_ip);
-
+        Log.d("생명주기 :", "onCreate() - Parent");
         sharedPreferences = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
         userId = findViewById(R.id.user_id);
         password = findViewById(R.id.password);
