@@ -6,6 +6,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -78,6 +80,14 @@ public class MyHomeFragment extends Fragment {
                         items.add(0, new PostItem(no, name,  imgPath, date)); // 첫 번째 매개변수는 몇번째에 추가 될지, 제일 위에 오도록
                         //adapter.notifyDataSetChanged();
                         adapter.notifyItemInserted(0);
+                        adapter.setOnItemClickListener(new PostAdapter.OnItemClickListener() {
+
+                            @Override
+                            public void onItemClick(View v, int pos) {
+                                Toast.makeText(getActivity(), pos+" 번째 아이템", Toast.LENGTH_SHORT).show();
+
+                            }
+                        });
                     }
                     recyclerView.setAdapter(adapter);
 

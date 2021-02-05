@@ -4,7 +4,7 @@ package com.example.deardiary;
 public class PostItem {
 
     String no;
-    String name;
+    String userId;
    //String msg;
     String imgPath;
     String date;
@@ -12,9 +12,9 @@ public class PostItem {
     public PostItem() {
     }
 
-    public PostItem(String no, String name,  String imgPath, String date) {
+    public PostItem(String no, String userId, String imgPath, String date) {
         this.no = no;
-        this.name = name;
+        this.userId = userId;
         //this.msg = msg;
         this.imgPath = imgPath;
         this.date = date;
@@ -28,12 +28,12 @@ public class PostItem {
         this.no = no;
     }
 
-    public String getName() {
-        return name;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
 //    public String getMsg() {

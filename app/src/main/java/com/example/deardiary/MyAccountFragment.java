@@ -176,6 +176,14 @@ public class MyAccountFragment extends Fragment {
                         items.add(0, new GridListItem(postId, imgPath, date));
                         adapter.notifyItemInserted(0);
 
+                        //아이템 클릭 이벤트 처리
+                        adapter.setOnItemClickListener(new GridListAdapter.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(View v, int pos) {
+                                Toast.makeText(getActivity(), pos+" 번째 아이템", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
                     }
 //                    for(int i=0; i<resJsonArray.length(); i++){
 //                        JSONObject jsonObject= resJsonArray.getJSONObject(i);

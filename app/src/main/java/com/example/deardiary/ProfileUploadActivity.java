@@ -303,13 +303,8 @@ public class ProfileUploadActivity extends AppCompatActivity implements Button.O
                     f.delete();
 
                 }
-
-
-
             }
-
         }
-
     }
 
 
