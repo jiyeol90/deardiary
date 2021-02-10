@@ -7,10 +7,8 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
@@ -28,7 +26,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.error.AuthFailureError;
 import com.android.volley.error.VolleyError;
-import com.android.volley.request.JsonArrayRequest;
 import com.android.volley.request.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
@@ -147,7 +144,7 @@ public class MyAccountFragment extends Fragment {
                      * 프로필 문구만 입력되어있는 경우 response값 (null)
                      * DB조회를 할때 ueser 테이블에서 프로필 이미지의 url (user_profile) 과 프로필 문구 (user_text) 컬럼을 select 하기 때문에 처리해 줘야 한다.
                      */
-                    if(!imageSrc.equals("default") || !imageSrc.equals("null")) {
+                    if(!imageSrc.equals("default") && !imageSrc.equals("null")) {
 
                         //UserInfo 객체에 이미지 경로 필드에 저장한다.
                         UserInfo.getInstance().setUserProfile(imageSrc);
@@ -170,6 +167,7 @@ public class MyAccountFragment extends Fragment {
                         JSONObject post = postArray.getJSONObject(i);
                         String postId = post.getString("id");
                         String imgPath= post.getString("img_src");
+                        String userId = post.getString("user_id");
                         String date= post.getString("created_date").substring(0,10);
 
                         imgPath = "http://3.36.92.185"+imgPath;
@@ -179,8 +177,14 @@ public class MyAccountFragment extends Fragment {
                         //아이템 클릭 이벤트 처리
                         adapter.setOnItemClickListener(new GridListAdapter.OnItemClickListener() {
                             @Override
-                            public void onItemClick(View v, int pos) {
-                                Toast.makeText(getActivity(), pos+" 번째 아이템", Toast.LENGTH_SHORT).show();
+                            public void onItemClick(View v, int position) {
+                                String postId = items.get(position).getId();
+                                Toast.makeText(getActivity(), position+" 번째 아이템", Toast.LENGTH_SHORT).show();
+                                Intent viewPostIntent = new Intent(getContext(), ViewPostActivity.class);
+                                viewPostIntent.putExtra("userId", userId);
+                                viewPostIntent.putExtra("postId", postId);
+                                startActivity(viewPostIntent);
+
                             }
                         });
 
@@ -224,7 +228,6 @@ public class MyAccountFragment extends Fragment {
                 HashMap<String, String> param = new HashMap<>();
 
                 String userId = UserInfo.getInstance().getId();
-                Log.d("index값", userId);
                 param.put("userId", userId);
 
                 return param;

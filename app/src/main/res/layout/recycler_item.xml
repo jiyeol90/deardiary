@@ -90,6 +90,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="16dp"/>
         <ToggleButton
+            android:id="@+id/tbn_heart"
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:background="@drawable/ic_heart_border"

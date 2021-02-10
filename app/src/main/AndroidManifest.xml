@@ -16,7 +16,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Deardiary"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ViewPost"></activity>
+        <activity android:name=".CommentActivity"></activity>
+        <activity android:name=".ViewPostActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -30,7 +31,6 @@
 
         <activity android:name=".ProfileUploadActivity" />
         <activity android:name=".DiaryPostActivity" />
-        <activity android:name=".DataInputActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

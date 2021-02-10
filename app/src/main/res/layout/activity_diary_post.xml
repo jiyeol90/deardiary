@@ -43,7 +43,7 @@
 
 
         <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/diary_text"
+            android:id="@+id/comment_text"
             android:layout_width="match_parent"
             android:layout_height="165dp"
             android:layout_marginLeft="20dp"

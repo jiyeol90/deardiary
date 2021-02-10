@@ -69,7 +69,7 @@ public class DiaryPostActivity extends AppCompatActivity {
         BusProvider.getInstance().register(this);
 
         diaryImage = findViewById(R.id.diary_image);
-        diaryText = findViewById(R.id.diary_text);
+        diaryText = findViewById(R.id.comment_text);
         diaryTag = findViewById(R.id.diary_tag);
         postButton = findViewById(R.id.post_btn);
 
