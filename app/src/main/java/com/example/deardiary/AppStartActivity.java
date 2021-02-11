@@ -91,6 +91,7 @@ public class AppStartActivity extends AppCompatActivity {
                 switch (item.getItemId()) {
 
                     case R.id.btn_account:
+
                         setFragment(0);
                         break;
 

@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -22,10 +28,13 @@ import com.android.volley.error.AuthFailureError;
 import com.android.volley.error.VolleyError;
 import com.android.volley.request.StringRequest;
 import com.bumptech.glide.Glide;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
@@ -68,6 +77,51 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         vh.tvName.setText(item.getUserId());
         vh.tvDate.setText(item.getDate());
 
+        if(item.getUserProfile().equals("default")) {
+            Glide.with(holder.itemView.getContext()).load(R.drawable.ic_profile_default).override(90, 90).into(vh.userProfile);
+        } else {
+            Glide.with(holder.itemView.getContext()).load(item.getUserProfile()).override(90, 90).into(vh.userProfile);
+        }
+
+        vh.userProfile.setTag(holder.getAdapterPosition());
+        vh.userProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int position = (int) v.getTag();
+                PostItem item = items.get(position);
+                String userId = item.getUserId();
+                Toast.makeText(context, Integer.toString(position) + "번째 아이템, 아이디 : " + userId , Toast.LENGTH_SHORT).show();
+
+                //로그인한 유저가 자신의 프로필 사진을 눌렀을때 MyAccountFragment로 이동한다.
+                if(UserInfo.getInstance().getId().equals(userId)) {
+                    String fragmentTag = MyHomeFragment.class.getClass().getSimpleName();
+                    Log.i("fragmentTag", fragmentTag);
+                    //R.id.bottomNavi
+                    Intent intent = new Intent(context, AppStartActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    context.startActivity(intent);// 플래그로 백스택 관리 필요
+                } else {
+                    FragmentManager fm = ((FragmentActivity) context).getSupportFragmentManager();
+                    FragmentTransaction ft = fm.beginTransaction();
+                    Fragment fragment = fm.findFragmentById(R.id.main_frame);
+                    ft.replace(R.id.main_frame, new MyAccountFragment());
+                    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                    ft.addToBackStack(null);
+                    ft.commit();
+                }
+//                FragmentManager fm = ((FragmentActivity) context).getSupportFragmentManager();
+//                FragmentTransaction ft = fm.beginTransaction();
+//                //fragmentTransaction.replace(R.id.main_frame, homeFragment);
+//                Fragment fragment = fm.findFragmentById(R.id.main_frame);
+//                //ft.remove(fragment);
+//                ft.replace(R.id.main_frame, new MyAccountFragment());
+//                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+//                ft.addToBackStack(fragmentTag);
+//                //ft.add(R.id.main_frame, new MyAccountFragment());
+//                ft.commit();
+            }
+        });
+
         //Tag값을 이용해서 위치를 알아낸다.
         //UserID와 같지 않다면 삭제버튼을 감춘다.
         if(!UserInfo.getInstance().getId().equals(item.getUserId())) {
@@ -84,7 +138,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     String userId = item.getUserId();
 
                     //Toast.makeText(context, Integer.toString(position) + "번째 아이템, 이름 : " + name + " , no : " + no, Toast.LENGTH_SHORT).show();
-                    
+
                     new AlertDialog.Builder(context)
 
                             .setTitle("페이지를 삭제하시겠습니까?")
@@ -161,7 +215,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
         TextView tvName;
         TextView tvDate;
-        TextView tvMsg;
+        CircleImageView userProfile;
         ImageButton btnEdit;
         ImageView iv;
 
@@ -170,7 +224,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
             tvName = itemView.findViewById(R.id.tv_userId);
             tvDate = itemView.findViewById(R.id.tv_date);
-            //tvMsg=itemView.findViewById(R.id.tv_msg);
+            userProfile=itemView.findViewById(R.id.userProfile);
             btnEdit = itemView.findViewById(R.id.edit_button);
             iv = itemView.findViewById(R.id.iv);
 

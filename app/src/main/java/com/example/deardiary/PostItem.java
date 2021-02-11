@@ -5,17 +5,17 @@ public class PostItem {
 
     String no;
     String userId;
-   //String msg;
+    String userProfile;
     String imgPath;
     String date;
 
     public PostItem() {
     }
 
-    public PostItem(String no, String userId, String imgPath, String date) {
+    public PostItem(String no, String userId, String userProfile, String imgPath, String date) {
         this.no = no;
         this.userId = userId;
-        //this.msg = msg;
+        this.userProfile = userProfile;
         this.imgPath = imgPath;
         this.date = date;
     }
@@ -36,13 +36,9 @@ public class PostItem {
         this.userId = userId;
     }
 
-//    public String getMsg() {
-//        return msg;
-//    }
-//
-//    public void setMsg(String msg) {
-//        this.msg = msg;
-//    }
+    public String getUserProfile() { return userProfile; }
+
+    public void setUserProfile(String userProfile) { this.userProfile = userProfile; }
 
     public String getImgPath() {
         return imgPath;

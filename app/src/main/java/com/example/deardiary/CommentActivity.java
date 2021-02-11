@@ -123,7 +123,9 @@ public class CommentActivity extends AppCompatActivity {
                 //2.포스트뷰 액티비티를 다시 로딩한다. (댓글 갯수 하나증가해준다.)
                 Toast.makeText(getApplicationContext(), "response",Toast.LENGTH_SHORT).show();
                 loadComment();
-                BusProvider.getInstance().post(new BusEvent(true));
+                CommentEvent commentEvent = new CommentEvent(postId, true);
+                BusProvider.getInstance().post(commentEvent);
+                //BusProvider.getInstance().post(new BusEvent(true));
             }
         }, new Response.ErrorListener() {
             @Override

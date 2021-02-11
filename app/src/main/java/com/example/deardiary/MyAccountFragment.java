@@ -105,6 +105,7 @@ public class MyAccountFragment extends Fragment {
     @Subscribe
     public void busStop(BusEvent busEvent) {//public항상 붙여줘야함
         if(busEvent.isFlag()) {
+            Log.i("BusEvent", "MyAccount 페이지 로딩하기");
             loadPage();
         }
     }
@@ -296,6 +297,5 @@ public class MyAccountFragment extends Fragment {
 
         return rootView;
     }
-
 
 }

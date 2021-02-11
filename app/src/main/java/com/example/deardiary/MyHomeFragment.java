@@ -31,6 +31,7 @@ public class MyHomeFragment extends Fragment {
 
     RecyclerView recyclerView;
 
+    PostItem item;
     ArrayList<PostItem> items= new ArrayList<>();
 
     PostAdapter adapter;
@@ -68,16 +69,21 @@ public class MyHomeFragment extends Fragment {
                     for(int i=0;i<response.length();i++){
                         JSONObject jsonObject= response.getJSONObject(i);
 
+                        String userProfile =jsonObject.getString("user_profile");
                         String no= jsonObject.getString("id"); //no가 문자열이라서 바꿔야함.
                         String name=jsonObject.getString("user_id");
-                        //String msg=jsonObject.getString("text_content");
                         String imgPath=jsonObject.getString("img_src");
                         String date=jsonObject.getString("created_date");
 
+                        if(userProfile.equals("null")) {
+                            userProfile = "default";
+                        } else {
+                            userProfile = "http://3.36.92.185"+userProfile;
+                        }
                         //이미지 경로의 경우 서버 IP가 제외된 주소이므로(uploads/xxxx.jpg) 바로 사용 불가.
                         imgPath = "http://3.36.92.185"+imgPath;
 
-                        items.add(0, new PostItem(no, name,  imgPath, date)); // 첫 번째 매개변수는 몇번째에 추가 될지, 제일 위에 오도록
+                        items.add(0, new PostItem(no, name, userProfile, imgPath, date)); // 첫 번째 매개변수는 몇번째에 추가 될지, 제일 위에 오도록
                         //adapter.notifyDataSetChanged();
                         adapter.notifyItemInserted(0);
                         adapter.setOnItemClickListener(new PostAdapter.OnItemClickListener() {

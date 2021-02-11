@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -113,8 +114,13 @@ public class ViewPostActivity extends AppCompatActivity implements View.OnClickL
     }
 
     @Subscribe
-    public void busStop(BusEvent busEvent) throws JSONException {//public항상 붙여줘야함
-        if(busEvent.isFlag()) {
+    public void busStop(CommentEvent commentEvent) throws JSONException {//public항상 붙여줘야함
+        if(commentEvent.isUpdate()) {
+            Log.i("BusEvent", "ViewPostActivity Comment 업데이트 하기");
+            //기존에 사용하던 JsonObjectRequest를 계속 사용하기 위해 Request로 보내준 JSonObject에 값을 하나 더 담아서 보내준다.
+            //기존에 userId와 PostId만 담은 JSonObject는 포스팅 하나를 로딩하기 위한 요청
+            // comment_cnt를 추가한 JSonObject는 댓글 갯수 업데이트를 위한 요청
+            //(두 요청에 해한 query의 차이점은 ViewCnt(조회수) 를 올리느냐의 유무 만 다르다.)
             requestJsonUserObject.put("comment_cnt", "comment_cnt");
             loadMyPost(requestJsonUserObject);
         }
@@ -191,4 +197,13 @@ public class ViewPostActivity extends AppCompatActivity implements View.OnClickL
         //요청큐에 요청 객체 생성
         requestQueue.add(jsonArrayRequest);
     }
+
+    //이벤트버스 등록해제
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        BusProvider.getInstance().unregister(this);
+        Log.d("생명주기 :", "onDestroy()");
+    }
+
 }
