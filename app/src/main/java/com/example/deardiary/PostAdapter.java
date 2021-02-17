@@ -89,11 +89,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             public void onClick(View v) {
                 int position = (int) v.getTag();
                 PostItem item = items.get(position);
-                String userId = item.getUserId();
-                Toast.makeText(context, Integer.toString(position) + "번째 아이템, 아이디 : " + userId , Toast.LENGTH_SHORT).show();
+                String clickedId = item.getUserId();
+                Toast.makeText(context, Integer.toString(position) + "번째 아이템, 아이디 : " + clickedId , Toast.LENGTH_SHORT).show();
 
+                UserInfo.getInstance().setClickedId(clickedId);
                 //로그인한 유저가 자신의 프로필 사진을 눌렀을때 MyAccountFragment로 이동한다.
-                if(UserInfo.getInstance().getId().equals(userId)) {
+                if(UserInfo.getInstance().getId().equals(clickedId)) {
                     String fragmentTag = MyHomeFragment.class.getClass().getSimpleName();
                     Log.i("fragmentTag", fragmentTag);
                     //R.id.bottomNavi
@@ -101,10 +102,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     context.startActivity(intent);// 플래그로 백스택 관리 필요
                 } else {
+                    //로그인한 유저가 다른 유저의 프로필 사진을 눌렀을때
+
                     FragmentManager fm = ((FragmentActivity) context).getSupportFragmentManager();
                     FragmentTransaction ft = fm.beginTransaction();
-                    Fragment fragment = fm.findFragmentById(R.id.main_frame);
-                    ft.replace(R.id.main_frame, new MyAccountFragment());
+                    ft.replace(R.id.main_frame, new OtherAccountFragment());
                     ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                     ft.addToBackStack(null);
                     ft.commit();

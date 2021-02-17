@@ -12,6 +12,7 @@ public class UserInfo {
     private String index;
     private String id;
     private String userName;
+    private String clickedId = "";
     //사용자가 나중에 입력해줄 값들은 초기화 해준다.
     private String userText = "";
     private String userProfile = "";
@@ -59,4 +60,8 @@ public class UserInfo {
     public String getUserProfile() { return userProfile; }
 
     public void setUserProfile(String userProfile) { this.userProfile = userProfile; }
+
+    public String getClickedId() { return clickedId; }
+
+    public void setClickedId(String clickedId) { this.clickedId = clickedId; }
 }

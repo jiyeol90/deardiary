@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MyAccountFragment">
+    tools:context=".OtherAccountFragment">
 
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -24,15 +24,15 @@
         android:layout_width="135dp"
         android:layout_height="40dp"
         android:layout_marginBottom="16dp"
+        android:gravity="center"
         android:text="소개를 입력하세요."
         android:textStyle="bold"
-        android:gravity="center"
         app:layout_constraintBottom_toTopOf="@+id/view_line"
-        app:layout_constraintEnd_toStartOf="@+id/btn_friend"
-        app:layout_constraintHorizontal_bias="0.62"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.108"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.994" />
+        app:layout_constraintVertical_bias="1.0" />
 
     <TextView
         android:id="@+id/comment_text"
@@ -64,11 +64,11 @@
         android:id="@+id/tv_friends_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="84dp"
-        android:layout_marginBottom="32dp"
+        android:layout_marginEnd="88dp"
+        android:layout_marginBottom="88dp"
         android:text="0"
         android:textSize="30dp"
-        app:layout_constraintBottom_toTopOf="@+id/chatting"
+        app:layout_constraintBottom_toTopOf="@id/view_line"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
@@ -85,26 +85,27 @@
 
     <Button
         android:id="@+id/btn_friend"
-        android:layout_width="80dp"
-        android:layout_height="38dp"
-        android:text="프로필"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="친구하기"
         app:layout_constraintBottom_toTopOf="@+id/view_line"
         app:layout_constraintEnd_toStartOf="@+id/chatting"
-        app:layout_constraintHorizontal_bias="0.645"
+        app:layout_constraintHorizontal_bias="0.488"
         app:layout_constraintStart_toEndOf="@+id/iv_profile"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.901" />
+        app:layout_constraintVertical_bias="0.906" />
 
     <Button
         android:id="@+id/chatting"
-        android:layout_width="100dp"
-        android:layout_height="38dp"
-        android:layout_marginEnd="24dp"
-        android:text="일기쓰기"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="28dp"
+        android:text="채팅하기"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/view_line"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.901" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_friends_count"
+        app:layout_constraintVertical_bias="0.634" />
 
     <View
         android:id="@+id/view_line"

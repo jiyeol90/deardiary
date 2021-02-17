@@ -16,7 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Deardiary"
         android:usesCleartextTraffic="true">
-        <activity android:name=".CommentActivity"></activity>
+        <activity android:name=".ChattingAcitivity"></activity>
+        <activity android:name=".OtherAccountFragment" />
+        <activity android:name=".CommentActivity" />
         <activity android:name=".ViewPostActivity" />
 
         <provider

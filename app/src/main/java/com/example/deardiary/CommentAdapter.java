@@ -64,6 +64,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
             Glide.with(holder.itemView.getContext()).load(item.getImgPath()).override(100, 100).into(vh.thumbnail);
         }
         vh.userId.setText(item.getId());
+
         String userId = UserInfo.getInstance().getId();
         if(!userId.equals(item.getId())) {
             vh.modify.setVisibility(View.INVISIBLE);

@@ -1,16 +1,16 @@
 package com.example.deardiary;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
-import android.content.Intent;
-import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.graphics.Color;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,16 +41,15 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-
-
-
-public class MyAccountFragment extends Fragment {
+public class OtherAccountFragment extends Fragment {
 
     public static final int REQUEST_CODE = 100;
     private Button btn_post;
     private TextView tv_postCnt;
     private TextView tv_profileText;
     private CircleImageView iv_profile;
+    private Button btn_friend;
+    private Button btn_chatting;
     private Button btn_profile;
     private ImageView iv_post;
 
@@ -151,7 +150,7 @@ public class MyAccountFragment extends Fragment {
                         UserInfo.getInstance().setUserProfile(imageSrc);
                         //서버에서 저장된 이미지 url
                         imageSrc = "http://3.36.92.185"+imageSrc;
-                        Glide.with(MyAccountFragment.this).load(imageSrc).into(iv_profile);
+                        Glide.with(OtherAccountFragment.this).load(imageSrc).into(iv_profile);
                     }
                     if(!profileText.equals("default") && !profileText.equals("null")) {
 
@@ -190,24 +189,7 @@ public class MyAccountFragment extends Fragment {
                         });
 
                     }
-//                    for(int i=0; i<resJsonArray.length(); i++){
-//                        JSONObject jsonObject= resJsonArray.getJSONObject(i);
-//
-//                        //String no= jsonObject.getString("id"); //no가 문자열이라서 바꿔야함.
-//                        // String name=jsonObject.getString("user_id");
-//
-//                        String imgPath=jsonObject.getString("img_src");
-//                        String date=jsonObject.getString("created_date").substring(0,10); // 2021-02-01 14:44:01 에서 년 월 일만 띄어준다.
-//
-//
-//                        //이미지 경로의 경우 서버 IP가 제외된 주소이므로(uploads/xxxx.jpg) 바로 사용 불가.
-//                        imgPath = "http://3.36.92.185"+imgPath;
-//
-//                        items.add(0, new GridListItem(imgPath, date)); // 첫 번째 매개변수는 몇번째에 추가 될지, 제일 위에 오도록
-//                        //adapter.notifyDataSetChanged();
-//                        adapter.notifyItemInserted(0);
-//
-//                    }
+
                     //리사이클러뷰의 레이아웃 매니저 설정
                     layoutManager= new GridLayoutManager(getActivity(),3);
                     rcv_grid.setLayoutManager(layoutManager);
@@ -228,7 +210,7 @@ public class MyAccountFragment extends Fragment {
             {
                 HashMap<String, String> param = new HashMap<>();
 
-                String userId = UserInfo.getInstance().getId();
+                String userId = UserInfo.getInstance().getClickedId();
                 param.put("userId", userId);
 
                 return param;
@@ -267,33 +249,31 @@ public class MyAccountFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.d("생명주기 :", "onCreateView()");
-        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_my_account, container, false);
-        btn_post = rootView.findViewById(R.id.chatting);
-        btn_profile = rootView.findViewById(R.id.btn_friend);
+        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_other_account, container, false);
         tv_postCnt = rootView.findViewById(R.id.tv_diary_count);
         iv_profile = rootView.findViewById(R.id.iv_profile);
         tv_profileText = rootView.findViewById(R.id.profile_text);
+        btn_friend = rootView.findViewById(R.id.btn_friend);
+        btn_chatting = rootView.findViewById(R.id.chatting);
 
-        //포스팅 버튼
-        btn_post.setOnClickListener(new View.OnClickListener() {
+        btn_friend.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(),DiaryPostActivity.class);
-                //startActivityForResult(intent,REQUEST_CODE);
-                //결과값으로 가져올 데이터가 없으므로 새로운 인텐트를 띄어준다.
-                startActivity(intent);
+                btn_friend.setBackgroundColor(Color.GRAY);
+                btn_friend.setClickable(false);
+                btn_chatting.setVisibility(View.VISIBLE);
+            }
+        });
+
+        //채팅버튼 누를시
+        btn_chatting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //채팅화면 띄어주기
             }
         });
         // 프로필 사진 업로드
-        btn_profile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(),ProfileUploadActivity.class);
-                //startActivityForResult(intent,REQUEST_CODE);
-                //결과값으로 가져올 데이터가 없으므로 새로운 인텐트를 띄어준다.
-                startActivity(intent);
-            }
-        });
 
         return rootView;
     }

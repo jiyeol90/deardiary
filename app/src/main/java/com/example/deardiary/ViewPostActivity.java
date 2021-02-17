@@ -62,14 +62,17 @@ public class ViewPostActivity extends AppCompatActivity implements View.OnClickL
         tv_date = findViewById(R.id.diary_date);
         modify_post = findViewById(R.id.modify_post);
 
-
-
-        modify_post.setOnClickListener(this);
-
         Intent postDataIntent = getIntent();
 
         userId = postDataIntent.getStringExtra("userId");
         postId = postDataIntent.getStringExtra("postId");
+
+        //수정 버튼은 사용자의 아이디로 자신의 포스트를 볼때만 보여준다.
+        if(UserInfo.getInstance().getClickedId().equals(UserInfo.getInstance().getId())) {
+            modify_post.setOnClickListener(this);
+        } else {
+            modify_post.setVisibility(View.INVISIBLE);
+        }
 
         requestJsonUserObject = new JSONObject();
 
