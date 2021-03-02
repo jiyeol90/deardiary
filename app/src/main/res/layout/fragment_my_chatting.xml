@@ -5,22 +5,11 @@
     android:layout_height="match_parent"
     tools:context=".MyChattingFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:id="@+id/my_chatting"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="30dp"
-        android:layout_gravity="center"
-        android:text="채팅리스트" />
-
-    <TextView
-        android:id="@+id/data"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="40dp"
-        android:textSize="30dp"
-        android:text="TextView" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_room"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#DDDDDD">
+    </androidx.recyclerview.widget.RecyclerView>
 
 </FrameLayout>

@@ -93,6 +93,7 @@ public class CommentActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                submitComment();
+               comment_text.getText().clear();
             }
         });
 

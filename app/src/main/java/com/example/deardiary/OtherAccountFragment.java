@@ -256,13 +256,20 @@ public class OtherAccountFragment extends Fragment {
         btn_friend = rootView.findViewById(R.id.btn_friend);
         btn_chatting = rootView.findViewById(R.id.chatting);
 
+        //친구맺기 버튼
         btn_friend.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
+
                 btn_friend.setBackgroundColor(Color.GRAY);
                 btn_friend.setClickable(false);
                 btn_chatting.setVisibility(View.VISIBLE);
+
+                //Todo 여기서 부터 시작 (02/26)
+                //String friendId = UserInfo.getInstance().getClickedId();
+               // makeFriend(friendId);
+
             }
         });
 
@@ -270,12 +277,69 @@ public class OtherAccountFragment extends Fragment {
         btn_chatting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+//                Intent chatIntent = new Intent(getContext(), ChattingActivity.class);
+//                startActivity(chatIntent);
+
+                Intent chatIntent = new Intent(getContext(), MyChattingActivity.class);
+                startActivity(chatIntent);
                 //채팅화면 띄어주기
             }
         });
         // 프로필 사진 업로드
 
         return rootView;
+    }
+
+    private void makeFriend(String friendId) {
+
+        final ProgressDialog progressDialog = new ProgressDialog(getContext());
+        progressDialog.setCancelable(false);
+        progressDialog.setIndeterminate(false);
+        progressDialog.setTitle("Update My Friend");
+        progressDialog.show();
+
+        String serverUrl="http://3.36.92.185/uploads/friend_upload.php";
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, serverUrl, new Response.Listener<String>() {
+            //volley 라이브러리의 GET방식은 버튼 누를때마다 새로운 갱신 데이터를 불러들이지 않음. 그래서 POST 방식 사용
+            @Override
+            public void onResponse(String response) {
+                progressDialog.dismiss();
+                //Toast.makeText(getActivity(), response.toString(), Toast.LENGTH_SHORT).show();
+                //파라미터로 응답받은 결과 JsonArray를 분석
+                if(response.equals("success")) {
+                    btn_friend.setBackgroundColor(Color.GRAY);
+                    btn_friend.setClickable(false);
+                    btn_chatting.setVisibility(View.VISIBLE);
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getActivity(), "ERROR", Toast.LENGTH_SHORT).show();
+            }
+
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError
+            {
+                HashMap<String, String> param = new HashMap<>();
+
+                String userId = UserInfo.getInstance().getId();
+                param.put("userId", userId);
+                param.put("freindId", friendId);
+
+                return param;
+            }
+        };
+
+        //실제 요청 작업을 수행해주는 요청큐 객체 생성
+        RequestQueue requestQueue= Volley.newRequestQueue(getActivity());
+
+        //요청큐에 요청 객체 생성
+        requestQueue.add(stringRequest);
+
     }
 
 }

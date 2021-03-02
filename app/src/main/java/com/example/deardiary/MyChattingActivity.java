@@ -2,6 +2,7 @@ package com.example.deardiary;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,11 +15,22 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.error.VolleyError;
+import com.android.volley.request.SimpleMultiPartRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -43,6 +55,7 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
     private Handler mHandler;
     Socket socket;
     private String ip = "3.36.92.185"; // IP 주소
+    private static final String ROOT_URL = "http://3.36.92.185/uploads/chatting_img_upload.php";
     private int port = 10001; // PORT번호
     private boolean initConnect = true;
     private boolean isConnected = true;
@@ -50,6 +63,8 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
     private InputStream inputStream;
     private OutputStream outputStream;
     private BufferedReader input;
+
+    private static int CHATTING_ROOM_ID = 1;
 
     private SimpleDateFormat format = new SimpleDateFormat ( "yyyy-MM-dd HH:mm:ss");
 
@@ -76,7 +91,7 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
 
         et_text = findViewById(R.id.textMessage);
         btn_send = findViewById(R.id.sendButton);
-        btn_start = findViewById(R.id.tcpStart);
+        //btn_start = findViewById(R.id.tcpStart);
         btn_img = findViewById(R.id.imgButton);
         textView = findViewById(R.id.text);
 
@@ -86,7 +101,7 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
 
 
         // 커스텀 어댑터 생성
-        m_Adapter = new ChattingListViewAdapter2();
+        m_Adapter = new ChattingListViewAdapter2(getApplicationContext());
 
         // Xml에서 추가한 ListView 연결
         m_RecyclerView = (RecyclerView) findViewById(R.id.recycler_chatting);
@@ -97,17 +112,6 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
         m_RecyclerView.setLayoutManager(manager); // LayoutManager 등록
         // ListView에 어댑터 연결
         m_RecyclerView.setAdapter(m_Adapter);
-
-//        m_Adapter.add("이건 뭐지", 1);
-//        m_Adapter.add("쿨쿨", 1);
-//        m_Adapter.add("쿨쿨쿨쿨", 0);
-//        m_Adapter.add("재미있게", 1);
-//        m_Adapter.add("놀자라구나힐힐 감사합니다. 동해물과 백두산이 마르고 닳도록 놀자 놀자 우리 놀자", 1);
-//        m_Adapter.add("재미있게", 1);
-//        m_Adapter.add("재미있게", 0);
-//        m_Adapter.add("2015/11/20", 2);
-//        m_Adapter.add("재미있게", 1);
-//        m_Adapter.add("재미있게", 1);
 
         et_text.addTextChangedListener(new TextWatcher() {
             @Override
@@ -164,15 +168,16 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
             DataInputStream dis = new DataInputStream(in);
 
                  */
-                sndMsg = UserInfo.getInstance().getId();
+                sndMsg = UserInfo.getInstance().getId()+"@"+UserInfo.getInstance().getClickedId(); // 내 Id + @ + 상대방 Id
+                Log.d(TAG, "메시지 내용 : " + sndMsg);
 
                 //화면 출력
-                out.println(sndMsg);
+                out.println(CHATTING_ROOM_ID + "@" + sndMsg);
                 out.flush();
 
 //                String read;
                 while ((read = input.readLine()) != null) {
-                    //                        read = input.readLine();
+//                    read = input.readLine();
 //                    mHandler.post(new msgUpdate(read));
 //                    Log.d("=============", read);
 //                    et_text.getText().clear();
@@ -187,21 +192,40 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
                             //1. 처음접속할때 뿌려줄 메시지 "[id] 님이 접속하였습니다."
                             //2. 내가 쓴 메시지 "imgj : [내 id] : 메시지 내용"
                             //3. 상태방이 쓴 메시지 "[상대방 id] : 메시지 내용"
-                            String protocol = read.split(":")[0].trim();
-                            String message = read.split(":")[1].trim();
+                            String[] filter = read.split("@");
 
-                            if(protocol.equals("initConnect")) {
+                            int protocolLoader = filter.length;
+                            String roomId = filter[0];
+                            CHATTING_ROOM_ID = Integer.parseInt(roomId);
+                            String senderUserId = filter[1];
+                            String contentType = filter[2];
+                            String content = filter[3];
+
+
+//                            String protocol = read.split(":")[0].trim();
+//                            String message = read.split(":")[1].trim();
+//                            String id = "";
+//                            if(protocolLoader > 2) {
+//                                id = read.split(":")[2].trim();
+//                            }
+
+                            if(contentType.equals("initConnect")) {
                                // m_Adapter.add(message, 2);
-                                m_Adapter.addItem(message);
-                            } else if (protocol.equals("img")) {
+                                m_Adapter.addItem(content);
+                            } else if (contentType.equals("img")) {
                                 //이미지를 보냈을때
+                                    if(senderUserId.equals(userId)) {
+                                        m_Adapter.addImageItem("http://3.36.92.185"+content, format_time); ///uploads/post_images/161426010420200731_185544.jpg
+                                    } else {
+                                        m_Adapter.addImageItem(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_profile_default), senderUserId, "http://3.36.92.185"+ content, format_time);
+                                    }
 
-                            } else if (protocol.equals(userId)) {
-                                m_Adapter.addItem(message, format_time);
-                            } else if (protocol.equals("disconnect")) {
-                                m_Adapter.addItem(message);
+                            } else if (senderUserId.equals(userId)) {
+                                m_Adapter.addItem(content, format_time);
+                            } else if (contentType.equals("disconnect")) {
+                                m_Adapter.addItem(content);
                             } else {
-                                m_Adapter.addItem(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_profile_default), protocol, message, format_time);//todo  protocol 수정할것
+                                m_Adapter.addItem(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_profile_default), senderUserId, content, format_time);//todo  protocol 수정할것
                             }
                             m_Adapter.notifyDataSetChanged();
                             //ArrayList의 크기의 index 위치로 포지셔닝.
@@ -230,6 +254,7 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
 
 
 
+
     @Override
     public void onClick(View v) {
         String message;
@@ -237,53 +262,14 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
         switch (v.getId()) {
             case R.id.sendButton:
                 if(out == null) return;
-//                ConnectThread th =new ConnectThread();
-//                th.start();
 
-//                message = et_text.getText().toString();
-//                mHandler.post(new msgUpdate(message));
-//                out.println(message);
-//                out.flush();
-//
-//                et_text.getText().clear();
                 message= et_text.getText().toString();
-
+                //개행문자 처리
+                message = message.replaceAll(System.getProperty("line.separator"), " ");
+                message = CHATTING_ROOM_ID + "@" + userId + "@" + "txt" + "@" + message;
                 SendThread st = new SendThread(message, out);
                 st.start();
-//                new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        // TODO Auto-generated method stub
-//                        //서버로 보낼 메세지 EditText로 부터 얻어오기
-//                        String msg= et_text.getText().toString();
-//
-//                        Log.d("msg", msg);
-//                        runOnUiThread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                String msg= et_text.getText().toString();
-//                                // TODO Auto-generated method stub
-//                                m_Adapter.add(et_text.getText().toString() + msg, 1);
-//                                m_Adapter.notifyDataSetChanged();
-//                                Log.d("=============", msg);
-//                                et_text.getText().clear();
-//
-//                            }
-//                        });
-//
-//
-//                        out.println(msg);
-//                        out.flush();
-//                    }//run method..
-//
-//                }).start(); //Thread 실행..
 
-//                message = et_text.getText().toString();
-
-                //중복되서 메시지가 출력된다.
-//                et_text.getText().clear();
-//                m_Adapter.add(message, 1);
-//                m_Adapter.notifyDataSetChanged();
                 break;
             case R.id.imgButton:
                 Intent intent = new Intent(Intent.ACTION_PICK);
@@ -315,16 +301,59 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
        if (requestCode == GET_GALLERY_IMAGE) {
-
-           String imagePath = getRealPathFromURI(data.getData());
-           //sendPicture를 스레드로 생성하면 While문이 있어 끝나지 않는다.
+            if(resultCode == RESULT_OK) {
+                String filePath = getRealPathFromURI(data.getData());
+                //sendPicture를 스레드로 생성하면 While문이 있어 끝나지 않는다.
 //           SendPictureThread sendPicThread = new SendPictureThread(imagePath, outputStream);
 //           sendPicThread.start();
 
-
-
-           sendPicture(imagePath);
+                Log.d("Volley 정보", filePath + " , " + userId);
+                sendImageFile(filePath, userId);
+            }
+           //sendPicture(filePath);
         }
+
+    }
+
+    private void sendImageFile(final String filePath, final String userId) {
+        SimpleMultiPartRequest smpr= new SimpleMultiPartRequest(Request.Method.POST, ROOT_URL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                //new AlertDialog.Builder(DiaryPostActivity.this).setMessage("응답:"+response).create().show();
+                //데이를 보낼 곳에 Boolean 값을 준다.
+                try {
+                    JSONObject obj = new JSONObject(response);
+                    String image_path = obj.getString("file_path");
+                    String image_width = obj.getString("file_width");
+                    String image_height = obj.getString("file_height");
+
+                    Log.d("image width, height", image_width + " , " + image_height);
+
+                    String message =  CHATTING_ROOM_ID + "@" + userId + "@" + "img" +"@"+ image_path;
+                    SendThread st = new SendThread(message, out);
+                    st.start();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                //finish();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+        //요청 객체에 보낼 데이터를 추가
+        smpr.addStringParam("userId", userId);
+        //이미지 파일 추가
+        smpr.addFile("image", filePath);
+
+        //요청객체를 서버로 보낼 우체통 같은 객체 생성
+        RequestQueue requestQueue= Volley.newRequestQueue(this);
+        requestQueue.add(smpr);
 
     }
 

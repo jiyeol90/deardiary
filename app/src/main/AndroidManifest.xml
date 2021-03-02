@@ -16,11 +16,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Deardiary"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ChattingAcitivity"></activity>
-        <activity android:name=".OtherAccountFragment" />
+        <activity android:name=".ChattingActivity"/>
+        <activity android:name=".MyChattingActivity"/>
         <activity android:name=".CommentActivity" />
         <activity android:name=".ViewPostActivity" />
-
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.example.deardiary.fileprovider"

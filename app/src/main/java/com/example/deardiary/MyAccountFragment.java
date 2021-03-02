@@ -42,8 +42,6 @@ import java.util.Map;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
-
-
 public class MyAccountFragment extends Fragment {
 
     public static final int REQUEST_CODE = 100;

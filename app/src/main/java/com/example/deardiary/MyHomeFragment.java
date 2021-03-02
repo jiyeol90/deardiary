@@ -70,10 +70,10 @@ public class MyHomeFragment extends Fragment {
                         JSONObject jsonObject= response.getJSONObject(i);
 
                         String userProfile =jsonObject.getString("user_profile");
-                        String no= jsonObject.getString("id"); //no가 문자열이라서 바꿔야함.
-                        String name=jsonObject.getString("user_id");
-                        String imgPath=jsonObject.getString("img_src");
-                        String date=jsonObject.getString("created_date");
+                        String no= jsonObject.getString("id"); //diaraypage.id -> 다이어리 아이디
+                        String name=jsonObject.getString("user_id"); // diarypage.user_id -> 다이어리 작성 아이디
+                        String imgPath=jsonObject.getString("img_src"); // diarypage.img_src -> 다이어리 이미지 src
+                        String date=jsonObject.getString("created_date"); // diarypage.created_date -> 다이어리 생성일
 
                         if(userProfile.equals("null")) {
                             userProfile = "default";

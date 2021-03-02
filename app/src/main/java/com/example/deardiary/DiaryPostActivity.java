@@ -307,7 +307,7 @@ public class DiaryPostActivity extends AppCompatActivity {
         smpr.addStringParam("tag", tag);
         smpr.addStringParam("userId", userId);
         //이미지 파일 추가
-        smpr.addFile("image", filePath);
+        smpr.addFile("image", filePath);//Todo  final Bitmap bitmap 인자를 받을이유가 없다.
 
         //요청객체를 서버로 보낼 우체통 같은 객체 생성
         RequestQueue requestQueue= Volley.newRequestQueue(this);

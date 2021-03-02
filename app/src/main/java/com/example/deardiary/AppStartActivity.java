@@ -242,7 +242,7 @@ public class AppStartActivity extends AppCompatActivity {
                 break;
 
             case 3:
-                fragmentTransaction.replace(R.id.main_frame, MyChattingFragment.newInstance("파라미터1", "파라미터2"));
+                fragmentTransaction.replace(R.id.main_frame, chattingFragment);
                 fragmentTransaction.commit();
                 break;
 

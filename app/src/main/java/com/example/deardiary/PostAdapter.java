@@ -84,6 +84,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         }
 
         vh.userProfile.setTag(holder.getAdapterPosition());
+
+        //포스트의 프로필을 누르면 해당 유저의 홈화면으로 이동한다.
         vh.userProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -92,6 +94,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 String clickedId = item.getUserId();
                 Toast.makeText(context, Integer.toString(position) + "번째 아이템, 아이디 : " + clickedId , Toast.LENGTH_SHORT).show();
 
+                //클릭 할 때마다 내가 클릭한 유저의 아이디를 UserInfo 클래스에 저장한다.
                 UserInfo.getInstance().setClickedId(clickedId);
                 //로그인한 유저가 자신의 프로필 사진을 눌렀을때 MyAccountFragment로 이동한다.
                 if(UserInfo.getInstance().getId().equals(clickedId)) {
