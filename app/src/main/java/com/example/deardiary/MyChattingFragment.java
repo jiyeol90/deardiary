@@ -23,6 +23,7 @@ import com.android.volley.Response;
 import com.android.volley.error.VolleyError;
 import com.android.volley.request.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.badge.BadgeDrawable;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -67,6 +68,12 @@ public class MyChattingFragment extends Fragment {
         //리사이클러뷰의 레이아웃 매니저 설정
         LinearLayoutManager layoutManager= new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false);
         recyclerView.setLayoutManager(layoutManager);
+
+
+
+
+
+
         //서버주소
         String serverUrl="http://3.36.92.185/loadingdata/load_post.php";
 
@@ -81,4 +88,7 @@ public class MyChattingFragment extends Fragment {
 
         return rootView;
     }
+
+
+
 }

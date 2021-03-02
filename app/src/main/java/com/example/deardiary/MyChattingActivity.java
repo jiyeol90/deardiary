@@ -63,6 +63,7 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
     private InputStream inputStream;
     private OutputStream outputStream;
     private BufferedReader input;
+    private boolean makeRoom = false;
 
     private static int CHATTING_ROOM_ID = 1;
 
@@ -74,7 +75,7 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
     //ListView m_ListView;
     RecyclerView m_RecyclerView;
    // ChattingListViewAdapter m_Adapter;
-   ChattingListViewAdapter2 m_Adapter;
+    ChattingListViewAdapter2 m_Adapter;
     EditText et_text;
     Button btn_send;
     Button btn_start;
@@ -95,7 +96,7 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
         btn_img = findViewById(R.id.imgButton);
         textView = findViewById(R.id.text);
 
-//        btn_start.setOnClickListener(this);
+//      btn_start.setOnClickListener(this);
         btn_send.setOnClickListener(this);
         btn_img.setOnClickListener(this);
 
@@ -134,14 +135,16 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
             }
         });
 
-       // btn_start.performClick();
+
+        //기존에 만들어 놓은 방이 있는 DB 탐색
+        // 없다면 makeRoom = false;
+        // 있다면 makeRoom = true;
+
 
         ConnectThread th =new ConnectThread();
         th.start();
 
-       
     }
-    
 
     class ConnectThread extends Thread {
 
@@ -175,7 +178,8 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
                 out.println(CHATTING_ROOM_ID + "@" + sndMsg);
                 out.flush();
 
-//                String read;
+
+
                 while ((read = input.readLine()) != null) {
 //                    read = input.readLine();
 //                    mHandler.post(new msgUpdate(read));
@@ -194,20 +198,11 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
                             //3. 상태방이 쓴 메시지 "[상대방 id] : 메시지 내용"
                             String[] filter = read.split("@");
 
-                            int protocolLoader = filter.length;
                             String roomId = filter[0];
                             CHATTING_ROOM_ID = Integer.parseInt(roomId);
                             String senderUserId = filter[1];
                             String contentType = filter[2];
                             String content = filter[3];
-
-
-//                            String protocol = read.split(":")[0].trim();
-//                            String message = read.split(":")[1].trim();
-//                            String id = "";
-//                            if(protocolLoader > 2) {
-//                                id = read.split(":")[2].trim();
-//                            }
 
                             if(contentType.equals("initConnect")) {
                                // m_Adapter.add(message, 2);
@@ -228,6 +223,17 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
                                 m_Adapter.addItem(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_profile_default), senderUserId, content, format_time);//todo  protocol 수정할것
                             }
                             m_Adapter.notifyDataSetChanged();
+
+                            //DB에 저장하기
+                            //기존에 만들어 놓은 방이 있는 DB 탐색
+                            // 없다면 makeRoom = false;
+                            // 있다면 makeRoom = true;
+                            if(!makeRoom) {
+                                //만들어진 방을 저장하고 true로 바꿔준다.
+                                makeRoom = true;
+                            }
+
+
                             //ArrayList의 크기의 index 위치로 포지셔닝.
                             m_RecyclerView.scrollToPosition(m_Adapter.getItemCount()-1);
                             Log.d("=============", read);
