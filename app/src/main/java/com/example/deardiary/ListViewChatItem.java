@@ -13,6 +13,7 @@ public class ListViewChatItem {
     private String imageURI;
 
     private Drawable iconDrawable ;
+    private String userProfileURI;
     private String date;
 
     public int getType() {
@@ -62,4 +63,8 @@ public class ListViewChatItem {
     public void setDate(String date) {
         this.date = date;
     }
+
+    public String getUserProfileURI() { return userProfileURI; }
+
+    public void setUserProfileURI(String userProfileURI) { this.userProfileURI = userProfileURI; }
 }

@@ -106,7 +106,7 @@ public class ChattingListViewAdapter2 extends RecyclerView.Adapter<RecyclerView.
 
             ((LeftImageViewHolder) holder).profile.setImageDrawable(listViewItem.getIconDrawable());
             ((LeftImageViewHolder) holder).userId.setText(listViewItem.getUserId());
-            ((LeftImageViewHolder) holder).image.setImageResource(R.drawable.ic_chatting);//Todo 이미지를 어떻게 표시할 것인가.
+            ((LeftImageViewHolder) holder).image.setImageResource(R.drawable.ic_chatting);
 
             Glide.with(holder.itemView.getContext()) //해당 환경의 Context나 객체 입력
                     .load(listViewItem.getImageURI()) //URL, URI 등등 이미지를 받아올 경로

@@ -266,7 +266,7 @@ public class OtherAccountFragment extends Fragment {
                 btn_friend.setClickable(false);
                 btn_chatting.setVisibility(View.VISIBLE);
 
-                //Todo 여기서 부터 시작 (02/26)
+                //Todo 여기서 부터 시작 (02/26) 친구 리스트 만들기
                 //String friendId = UserInfo.getInstance().getClickedId();
                // makeFriend(friendId);
 
