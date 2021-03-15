@@ -64,7 +64,6 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
     private OutputStream outputStream;
     private BufferedReader input;
 
-
     private int CHATTING_ROOM_ID;
     private String initMessage;
 
@@ -150,8 +149,8 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
 
     private void loadChatRoomData() {
         {
-            String myId = UserInfo.getInstance().getId();
-            String friendId = UserInfo.getInstance().getClickedId();
+//            String myId = UserInfo.getInstance().getId();
+//            String friendId = UserInfo.getInstance().getClickedId();
 
             String SERVER_URL = "http://3.36.92.185/chattingdata/load_room_data.php";
 
@@ -171,6 +170,7 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
 
                     if(roomInfo[0].equals("roomId")) {
                         initMessage = roomInfo[1];
+                        CHATTING_ROOM_ID = Integer.parseInt(initMessage);
                         //roomId를 가지고 넘어올때만 채팅룸의 내용을 보여준다.
                         loadChatMessage(initMessage);
                     }else if(roomInfo[0].equals("lastRoomId")) {
@@ -204,8 +204,8 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
 
 
                     //String postId = UserInfo.getInstance().getId();
-                    param.put("myId", myId); //todo roomId 를 String? int?
-                    param.put("friendId", friendId);
+                    param.put("myId", MY_ID); //todo roomId 를 String? int?
+                    param.put("friendId", FRIEND_ID);
 
                 /*
                 CHATTING_ROOM_ID = Integer.parseInt(roomId);
@@ -347,9 +347,9 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
                 sndMsg = UserInfo.getInstance().getId()+"@"+UserInfo.getInstance().getClickedId(); // 내 Id + @ + 상대방 Id
                 Log.d(TAG, "메시지 내용 : " + sndMsg);
 
-                //화면 출력
+                //[방번호]@[내아이디]@[상대방아이디]
                 out.println(initMessage + "@" + sndMsg);
-                //out.println(CHATTING_ROOM_ID + "@" + sndMsg);
+
                 out.flush();
 
 
@@ -463,6 +463,9 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
             @Override
             public void onResponse(String response) {
 
+                if(response.contains("/부재중")) {
+                    notificationMessage(roomId, senderUserId, friendId, contentType, content);
+                }
                 Toast.makeText(getApplicationContext(), response,Toast.LENGTH_SHORT).show();
 
                 //BusProvider.getInstance().post(new BusEvent(true));
@@ -482,7 +485,7 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
 
                 //String postId = UserInfo.getInstance().getId();
                 param.put("roomId", roomId); //todo roomId 를 String? int?
-                param.put("userId", senderUserId);
+                param.put("myId", senderUserId);
                 param.put("friendId", friendId);
                 param.put("contentType", contentType);
                 param.put("content", content);
@@ -505,6 +508,12 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
         requestQueue.add(stringRequest);
 
     }
+
+    //FCM Notification
+    private void notificationMessage(String roomId, String senderUserId, String friendId, String contentType, String content) {
+
+
+    }
     // 받은 메시지 출력
 //    class msgUpdate implements Runnable {
 //        private String msg;
@@ -518,7 +527,72 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
 //    };
 
 
+    //채팅방을 나가는 경우 는 2가지
+    //1. 뒤로가기로 빠져나가거나
+    //2. 앱을 꺼버려 onDestroy()가 호출될때
+    // 생명주기 에 따라 뒤로가기가 호출되면 그다음에 onPause -> onStop -> onDestroy 가 호출된다.
+    // 그렇기 때문에 뒤로가기를 누른 경우와 그냥 나간 경우를 구분해서 호출해줘야 한다.
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
 
+            if (out == null) return;
+            String message = CHATTING_ROOM_ID + "@" + MY_ID + "@" + "disconnect" + "@" + "/&quit";
+            SendThread st = new SendThread(message, out);
+            st.start();
+
+            //user_status 1로 업데이트 한다.
+            userStatusUpdate();
+
+    }
+
+
+    private void userStatusUpdate() {
+
+        String SERVER_URL = "http://3.36.92.185/chattingdata/user_status_upload.php";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, SERVER_URL, new Response.Listener<String>() {
+            //volley 라이브러리의 GET방식은 버튼 누를때마다 새로운 갱신 데이터를 불러들이지 않음. 그래서 POST 방식 사용
+            @Override
+            public void onResponse(String response) {
+
+                Toast.makeText(getApplicationContext(), response,Toast.LENGTH_SHORT).show();
+                //BusProvider.getInstance().post(new BusEvent(true));
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(), "ERROR", Toast.LENGTH_SHORT).show();
+            }
+
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError
+            {
+                HashMap<String, String> param = new HashMap<>();
+
+
+                //String postId = UserInfo.getInstance().getId();
+                param.put("roomId", String.valueOf(CHATTING_ROOM_ID));
+                param.put("myId", MY_ID);
+
+                /*
+                CHATTING_ROOM_ID = Integer.parseInt(roomId);
+                String senderUserId = filter[1];
+                String contentType = filter[2];
+                String content = filter[3];
+                 */
+
+                return param;
+            }
+        };
+
+        //실제 요청 작업을 수행해주는 요청큐 객체 생성
+        RequestQueue requestQueue= Volley.newRequestQueue(getApplicationContext());
+
+        //요청큐에 요청 객체 생성
+        requestQueue.add(stringRequest);
+
+    }
 
     @Override
     public void onClick(View v) {

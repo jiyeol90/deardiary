@@ -27,6 +27,7 @@ import com.android.volley.request.JsonArrayRequest;
 import com.android.volley.request.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.badge.BadgeDrawable;
+import com.squareup.otto.Subscribe;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,11 +49,16 @@ public class MyChattingFragment extends Fragment {
     ChattingRoomAdapter adapter;
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        BusProvider.getInstance().register(this);
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         recyclerView= view.findViewById(R.id.recycler_room);
         adapter= new ChattingRoomAdapter(getActivity(), items);
-
 
 
 
@@ -68,11 +74,16 @@ public class MyChattingFragment extends Fragment {
 //        adapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.ic_profile_default), "james", "마지막 메시지", "2021-03-02 11 : 07");
 //        adapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.ic_profile_default), "james", "마지막 메시지", "2021-03-02 11 : 07");
 
-
-
-
-
     }
+
+    @Subscribe
+    public void busStop(ChatEvent chatEvent) {//public항상 붙여줘야함
+        if(chatEvent.isFlag()) {
+            Log.i("BusEvent", "MyAccount 페이지 로딩하기");
+            loadingRoomList();
+        }
+    }
+
 
     //1. 내가 참여한 채팅방의 목록을 모두 표시한다.
     //2. 채팅방에는 상대방의 프로필과 (한명일때, 여러명일때)
@@ -120,6 +131,7 @@ public class MyChattingFragment extends Fragment {
                             String content = roomObject.getString("content");
                             String createdDate = roomObject.getString("created_date");
                             JSONArray friendArray = roomObject.getJSONArray("friend");
+
                             for(int j = 0; j < friendArray.length(); j++) {
                                 JSONObject friendObject = friendArray.getJSONObject(j);
                                 String friendId = friendObject.getString("user_id");
@@ -202,6 +214,9 @@ public class MyChattingFragment extends Fragment {
         return rootView;
     }
 
-
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        BusProvider.getInstance().unregister(this);
+    }
 }

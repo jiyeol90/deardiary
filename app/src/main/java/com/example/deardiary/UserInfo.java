@@ -16,6 +16,8 @@ public class UserInfo {
     //사용자가 나중에 입력해줄 값들은 초기화 해준다.
     private String userText = "";
     private String userProfile = "";
+    private boolean isTokenSaved = false;
+    private String token;
 
 
     private UserInfo() {
@@ -64,4 +66,12 @@ public class UserInfo {
     public String getClickedId() { return clickedId; }
 
     public void setClickedId(String clickedId) { this.clickedId = clickedId; }
+
+    public boolean isTokenSaved() { return isTokenSaved; }
+
+    public void setTokenSaved(boolean tokenSaved) { isTokenSaved = tokenSaved; }
+
+    public String getToken() { return token; }
+
+    public void setToken(String token) { this.token = token; }
 }

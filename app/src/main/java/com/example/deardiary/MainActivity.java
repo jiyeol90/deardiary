@@ -95,52 +95,54 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(String response)
             {
-                try {
-                    JSONArray resJsonArray = new JSONArray(response);
-
-                if (resJsonArray.length() != 0) {
+                if(response.equals("Wrong Password") || response.equals("This ID is not registered")) {
                     progressDialog.dismiss();
                     Toast.makeText(MainActivity.this, response, Toast.LENGTH_SHORT).show();
-                    for(int i=0; i<resJsonArray.length(); i++) {
-                        JSONObject jsonObject = resJsonArray.getJSONObject(i);
+                }else {
+                    try {
+                        JSONArray resJsonArray = new JSONArray(response);
 
-                        String index = jsonObject.getString("id");
-                        String userId = jsonObject.getString("user_id");
-                        String  userName = jsonObject.getString("user_name");
+                        if (resJsonArray.length() != 0) {
+                            progressDialog.dismiss();
+                            Toast.makeText(MainActivity.this, response, Toast.LENGTH_SHORT).show();
+                            for (int i = 0; i < resJsonArray.length(); i++) {
+                                JSONObject jsonObject = resJsonArray.getJSONObject(i);
 
-                        Log.i("id가져오기", "id : "+ index + " ,userid :" + userId + " , userName : " + userName);
-                        UserInfo userInfo = UserInfo.getInstance();
-                        userInfo.setIndex(index);
-                        userInfo.setId(userId);
-                        userInfo.setUserName(userName);
+                                String index = jsonObject.getString("id");
+                                String userId = jsonObject.getString("user_id");
+                                String userName = jsonObject.getString("user_name");
+
+                                Log.i("id가져오기", "id : " + index + " ,userid :" + userId + " , userName : " + userName);
+                                UserInfo userInfo = UserInfo.getInstance();
+                                userInfo.setIndex(index);
+                                userInfo.setId(userId);
+                                userInfo.setUserName(userName);
                         /*
                         "id": "1",
                         "user_id": "james",
                         "user_name": "\uc724\uc9c0\uc5f4"
                          */
-                    }
+                            }
+
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            if (loginState.isChecked()) {
+                                editor.putString(getResources().getString(R.string.prefLoginState), "loggedin");
+                            } else {
+                                editor.putString(getResources().getString(R.string.prefLoginState), "loggedout");
+                            }
+                            editor.apply();
+
+                            Intent appStartIntent = new Intent(MainActivity.this, AppStartActivity.class);
+                            appStartIntent.putExtra("userId", userId);
+                            appStartIntent.putExtra("password", password);
+                            startActivity(appStartIntent);
+                        }
 
 
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    if (loginState.isChecked()) {
-                        editor.putString(getResources().getString(R.string.prefLoginState), "loggedin");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                    else {
-                        editor.putString(getResources().getString(R.string.prefLoginState), "loggedout");
-                    }
-                    editor.apply();
-
-                    Intent appStartIntent = new Intent(MainActivity.this, AppStartActivity.class);
-                    appStartIntent.putExtra("userId", userId);
-                    appStartIntent.putExtra("password", password);
-                    startActivity(appStartIntent);
                 }
-
-                else {
-                    progressDialog.dismiss();
-                    Toast.makeText(MainActivity.this, response, Toast.LENGTH_SHORT).show();
-                }
-                }catch (JSONException e) {e.printStackTrace();}
             }
         }, new Response.ErrorListener() {
             @Override
