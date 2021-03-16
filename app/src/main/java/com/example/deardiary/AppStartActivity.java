@@ -70,6 +70,12 @@ public class AppStartActivity extends AppCompatActivity {
         Intent notificationIntent = getIntent();
         if(notificationIntent.hasExtra("user_id")) {
             UserInfo.getInstance().setId(notificationIntent.getStringExtra("user_id"));
+            UserInfo.getInstance().setClickedId(notificationIntent.getStringExtra("friend_id"));
+
+            Intent directToChattingIntent = new Intent(this, MyChattingActivity.class);
+            directToChattingIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+            startActivity(directToChattingIntent);
         }
 
 

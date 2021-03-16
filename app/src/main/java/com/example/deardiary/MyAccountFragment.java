@@ -266,7 +266,7 @@ public class MyAccountFragment extends Fragment {
                              Bundle savedInstanceState) {
         Log.d("생명주기 :", "onCreateView()");
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_my_account, container, false);
-        btn_post = rootView.findViewById(R.id.chatting);
+        btn_post = rootView.findViewById(R.id.diary);
         btn_profile = rootView.findViewById(R.id.btn_friend);
         tv_postCnt = rootView.findViewById(R.id.tv_diary_count);
         iv_profile = rootView.findViewById(R.id.iv_profile);

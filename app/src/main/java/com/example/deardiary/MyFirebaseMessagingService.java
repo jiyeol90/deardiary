@@ -49,7 +49,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         //Intent intent = new Intent(this, MyChattingActivity.class);
         Intent intent = new Intent(this, AppStartActivity.class);
         intent.putExtra("user_id", user_id);
-        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra("friend_id", title);
+
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 

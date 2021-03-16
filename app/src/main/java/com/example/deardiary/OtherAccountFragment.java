@@ -7,7 +7,9 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -117,7 +119,7 @@ public class OtherAccountFragment extends Fragment {
         progressDialog.setTitle("Loading My Page");
         progressDialog.show();
 
-        String serverUrl="http://3.36.92.185/loadingdata/mypage_load.php";
+        String serverUrl="http://3.36.92.185/loadingdata/otherpage_load.php";
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, serverUrl, new Response.Listener<String>() {
             //volley 라이브러리의 GET방식은 버튼 누를때마다 새로운 갱신 데이터를 불러들이지 않음. 그래서 POST 방식 사용
@@ -137,6 +139,7 @@ public class OtherAccountFragment extends Fragment {
                     String imageSrc = upperMypage.getString("user_profile");
                     String profileText = upperMypage.getString("user_text");
                     String cnt = upperMypage.getString("postCnt");
+                    String friendOrNot = upperMypage.getString("friendOrNot");
                     Log.i("포스팅 개수", cnt);
 
                     /*
@@ -160,6 +163,15 @@ public class OtherAccountFragment extends Fragment {
                     }
 
                     tv_postCnt.setText(cnt);
+
+                    //친구상태일 경우 체크를 해준다.
+                    if(friendOrNot.equals("1")) {
+                        btn_friend.setBackgroundColor(Color.GRAY);
+                        btn_friend.setText("친구끊기");
+//                        btn_friend.setClickable(false);
+                        btn_chatting.setVisibility(View.VISIBLE);
+                    }
+
 
                     JSONArray postArray = resJsonArray.getJSONArray(1);
                     Log.i("postArray 수", Integer.toString(postArray.length()));
@@ -211,7 +223,9 @@ public class OtherAccountFragment extends Fragment {
                 HashMap<String, String> param = new HashMap<>();
 
                 String userId = UserInfo.getInstance().getClickedId();
+                String myId = UserInfo.getInstance().getId();
                 param.put("userId", userId);
+                param.put("myId", myId);
 
                 return param;
             }
@@ -254,7 +268,7 @@ public class OtherAccountFragment extends Fragment {
         iv_profile = rootView.findViewById(R.id.iv_profile);
         tv_profileText = rootView.findViewById(R.id.profile_text);
         btn_friend = rootView.findViewById(R.id.btn_friend);
-        btn_chatting = rootView.findViewById(R.id.chatting);
+        btn_chatting = rootView.findViewById(R.id.diary);
 
         //친구맺기 버튼
         btn_friend.setOnClickListener(new View.OnClickListener() {
@@ -262,13 +276,18 @@ public class OtherAccountFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                btn_friend.setBackgroundColor(Color.GRAY);
-                btn_friend.setClickable(false);
-                btn_chatting.setVisibility(View.VISIBLE);
+                if(btn_friend.getText().equals("친구하기")) {
+                    btn_friend.setBackgroundColor(Color.GRAY);
+//                btn_friend.setClickable(false);
+                    btn_friend.setText("친구끊기");
+                    btn_chatting.setVisibility(View.GONE);
 
-                //Todo 여기서 부터 시작 (02/26) 친구 리스트 만들기
-                //String friendId = UserInfo.getInstance().getClickedId();
-               // makeFriend(friendId);
+                    //Todo 여기서 부터 시작 (02/26) 친구 리스트 만들기
+                    String friendId = UserInfo.getInstance().getClickedId();
+                    makeFriend(friendId);
+                } else {
+                    showDialog();
+                }
 
             }
         });
@@ -290,7 +309,30 @@ public class OtherAccountFragment extends Fragment {
         return rootView;
     }
 
+    void showDialog() {
+        AlertDialog.Builder msgBuilder = new AlertDialog.Builder(getActivity())
+                .setTitle("알림")
+                .setMessage("친구를 끊으시겠습니까?")
+                .setPositiveButton("네", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        makeFriend("cancel");
+                        Toast.makeText(getActivity(), "친구를 끊었습니다.", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Toast.makeText(getActivity(), "취소하였습니다.", Toast.LENGTH_SHORT).show();
+                    } });
+        AlertDialog msgDlg = msgBuilder.create();
+        msgDlg.show();
+    }
+
+
     private void makeFriend(String friendId) {
+
+        String serverUrl = "";
 
         final ProgressDialog progressDialog = new ProgressDialog(getContext());
         progressDialog.setCancelable(false);
@@ -298,19 +340,29 @@ public class OtherAccountFragment extends Fragment {
         progressDialog.setTitle("Update My Friend");
         progressDialog.show();
 
-        String serverUrl="http://3.36.92.185/uploads/friend_upload.php";
+        if(friendId.equals("cancel")) {
+            serverUrl = "http://3.36.92.185/uploads/friend_cancel_upload.php";
+        } else {
+            serverUrl = "http://3.36.92.185/uploads/friend_upload.php";
+        }
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, serverUrl, new Response.Listener<String>() {
             //volley 라이브러리의 GET방식은 버튼 누를때마다 새로운 갱신 데이터를 불러들이지 않음. 그래서 POST 방식 사용
             @Override
             public void onResponse(String response) {
                 progressDialog.dismiss();
-                //Toast.makeText(getActivity(), response.toString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), response.toString(), Toast.LENGTH_SHORT).show();
                 //파라미터로 응답받은 결과 JsonArray를 분석
                 if(response.equals("success")) {
                     btn_friend.setBackgroundColor(Color.GRAY);
-                    btn_friend.setClickable(false);
+                    btn_friend.setText("친구끊기");
+                    //btn_friend.setClickable(false);
                     btn_chatting.setVisibility(View.VISIBLE);
+                } else if(response.equals("cancel")) {
+                    btn_friend.setBackgroundColor(Color.parseColor("#6200EE"));//@color/mtrl_btn_ripple_color
+                    btn_friend.setText("친구하기");
+                    //btn_friend.setClickable(false);
+                    btn_chatting.setVisibility(View.GONE);
                 }
 
             }
@@ -328,7 +380,7 @@ public class OtherAccountFragment extends Fragment {
 
                 String userId = UserInfo.getInstance().getId();
                 param.put("userId", userId);
-                param.put("freindId", friendId);
+                param.put("friendId", friendId);
 
                 return param;
             }

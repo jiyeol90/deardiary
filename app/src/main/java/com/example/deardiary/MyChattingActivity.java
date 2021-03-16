@@ -463,9 +463,6 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
             @Override
             public void onResponse(String response) {
 
-                if(response.contains("/부재중")) {
-                    notificationMessage(roomId, senderUserId, friendId, contentType, content);
-                }
                 Toast.makeText(getApplicationContext(), response,Toast.LENGTH_SHORT).show();
 
                 //BusProvider.getInstance().post(new BusEvent(true));
@@ -509,11 +506,6 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
 
     }
 
-    //FCM Notification
-    private void notificationMessage(String roomId, String senderUserId, String friendId, String contentType, String content) {
-
-
-    }
     // 받은 메시지 출력
 //    class msgUpdate implements Runnable {
 //        private String msg;
