@@ -10,21 +10,23 @@ public class ChatRoomItem {
     // 아이템 타입을 구분하기 위한 type 변수.
     private int type ;
 
+    private String roomId;
     private String contentType;
     private String content;
     private String clickedId;
     private String imageURI;
-    private HashMap<String, String> friendMap;
+    private HashMap<String, String> friendsMap;
 
     private Drawable iconDrawable ;
     private String date;
     //iconDrawable, friendMap, contentType, content, date
-    public ChatRoomItem(Drawable iconDrawable, HashMap<String, String> friendMap, String contentType, String content, String date) {
+    public ChatRoomItem(Drawable iconDrawable, HashMap<String, String> friendsMap, String contentType, String content, String date, String roomId) {
         this.iconDrawable = iconDrawable;
-        this.friendMap = friendMap;
+        this.friendsMap = friendsMap;
         this.contentType = contentType;
         this.content = content;
         this.date = date;
+        this.roomId = roomId;
     }
 
     public int getType() {
@@ -75,12 +77,12 @@ public class ChatRoomItem {
         this.date = date;
     }
 
-    public HashMap<String, String> getFriendMap() {
-        return friendMap;
+    public HashMap<String, String> getFriendsMap() {
+        return friendsMap;
     }
 
-    public void setFriendMap(HashMap<String, String> friendMap) {
-        this.friendMap = friendMap;
+    public void setFriendsMap(HashMap<String, String> friendsMap) {
+        this.friendsMap = friendsMap;
     }
 
     public String getContentType() {
@@ -90,4 +92,8 @@ public class ChatRoomItem {
     public void setContentType(String contentType) {
         this.contentType = contentType;
     }
+
+    public String getRoomId() { return roomId; }
+
+    public void setRoomId(String roomId) { this.roomId = roomId; }
 }

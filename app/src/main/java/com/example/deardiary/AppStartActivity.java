@@ -50,6 +50,7 @@ public class AppStartActivity extends AppCompatActivity {
 
     private String myId;
     private String server_ip;
+    private String SERVER_URL;
     private String FCM_TOKEN;
 
     private BottomNavigationView bottomNavigationView;
@@ -67,12 +68,14 @@ public class AppStartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_app_start);
 
+        //채팅 알람을 통해 들어올 경우
         Intent notificationIntent = getIntent();
         if(notificationIntent.hasExtra("user_id")) {
             UserInfo.getInstance().setId(notificationIntent.getStringExtra("user_id"));
             UserInfo.getInstance().setClickedId(notificationIntent.getStringExtra("friend_id"));
 
             Intent directToChattingIntent = new Intent(this, MyChattingActivity.class);
+            directToChattingIntent.putExtra("direct", "direct");
             directToChattingIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
             startActivity(directToChattingIntent);
@@ -110,7 +113,7 @@ public class AppStartActivity extends AppCompatActivity {
 //            UserInfo.getInstance().setTokenSaved(true);
         }
         server_ip = getString(R.string.server_ip);
-        String serverUrl = "http://"+ server_ip +"/loginregister/user_info.php";
+        //SERVER_URL = "http://"+ server_ip +"/loginregister/user_info.php";
         //Todo 위치를 MainActivity로 옮겨준다.
         //notifyUserInfo(requestJsonUserObject, serverUrl);
 
@@ -122,6 +125,7 @@ public class AppStartActivity extends AppCompatActivity {
         setFragment(0); //첫 프래그먼트 화면을 지정한다.
 
         bottomNavigationView = findViewById(R.id.bottomNavi);
+
 
         //BottomNavigation으로 fragment화면 전환
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -150,6 +154,27 @@ public class AppStartActivity extends AppCompatActivity {
                 return true;
             }
         });
+
+
+        //노티로 들어오는 화면은 모두 chattingFragment를 통해 roomId를 통해 들어가도록하자
+//        Intent notificationIntent = getIntent();
+//        if(notificationIntent.hasExtra("user_id")) {
+//            UserInfo.getInstance().setId(notificationIntent.getStringExtra("user_id"));
+//            UserInfo.getInstance().setClickedId(notificationIntent.getStringExtra("friend_id"));
+//            UserInfo.getInstance().setRoomId(notificationIntent.getStringExtra("room_id"));
+//
+//            bottomNavigationView.setSelectedItemId(R.id.btn_chatting);
+//
+//            Intent directToChattingIntent = new Intent(this, MyChattingActivity.class);
+//            directToChattingIntent.putExtra("direct", "direct");
+//            directToChattingIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//
+//            startActivity(directToChattingIntent);
+//        }
+
+
+
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -213,7 +238,7 @@ public class AppStartActivity extends AppCompatActivity {
     //토큰 업데이트 -> 기기마다 다른 토큰이 부여되므로 로그인 할때마다 업데이트 해준다. (같은 아이디로 다른 기기에 접속했을 때를 파악해 준다.)
     private void saveFCMToken() {
 
-        String SERVER_URL = "http://3.36.92.185/loginregister/register_FCM_token.php";
+        SERVER_URL = "http://"+server_ip+"/loginregister/register_FCM_token.php";
         StringRequest request = new StringRequest(Request.Method.POST, SERVER_URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response)
@@ -284,4 +309,8 @@ public class AppStartActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+
+    }
 }

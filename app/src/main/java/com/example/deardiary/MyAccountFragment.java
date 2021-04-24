@@ -48,9 +48,14 @@ public class MyAccountFragment extends Fragment {
     private Button btn_post;
     private TextView tv_postCnt;
     private TextView tv_profileText;
+    private TextView tv_friends;
+    private TextView tv_friends_cnt;
     private CircleImageView iv_profile;
     private Button btn_profile;
     private ImageView iv_post;
+
+    private String server_ip;
+    private String SERVER_URL;
 
     GridLayoutManager layoutManager;
     GridView gridView;
@@ -67,6 +72,9 @@ public class MyAccountFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Log.d("생명주기 :", "onCreate()");
         BusProvider.getInstance().register(this);
+
+        server_ip = getString(R.string.server_ip);
+
     }
 
     @Override
@@ -116,9 +124,9 @@ public class MyAccountFragment extends Fragment {
         progressDialog.setTitle("Loading My Page");
         progressDialog.show();
 
-        String serverUrl="http://3.36.92.185/loadingdata/mypage_load.php";
+        SERVER_URL="http://"+server_ip+"/loadingdata/mypage_load.php";
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, serverUrl, new Response.Listener<String>() {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, SERVER_URL, new Response.Listener<String>() {
             //volley 라이브러리의 GET방식은 버튼 누를때마다 새로운 갱신 데이터를 불러들이지 않음. 그래서 POST 방식 사용
             @Override
             public void onResponse(String response) {
@@ -136,6 +144,7 @@ public class MyAccountFragment extends Fragment {
                     String imageSrc = upperMypage.getString("user_profile");
                     String profileText = upperMypage.getString("user_text");
                     String cnt = upperMypage.getString("postCnt");
+                    String friendCnt = upperMypage.getString("friendCnt");
                     Log.i("포스팅 개수", cnt);
 
                     /*
@@ -148,7 +157,7 @@ public class MyAccountFragment extends Fragment {
                         //UserInfo 객체에 이미지 경로 필드에 저장한다.
                         UserInfo.getInstance().setUserProfile(imageSrc);
                         //서버에서 저장된 이미지 url
-                        imageSrc = "http://3.36.92.185"+imageSrc;
+                        imageSrc = "http://"+server_ip+imageSrc;
                         Glide.with(MyAccountFragment.this).load(imageSrc).into(iv_profile);
                     }
                     if(!profileText.equals("default") && !profileText.equals("null")) {
@@ -159,6 +168,7 @@ public class MyAccountFragment extends Fragment {
                     }
 
                     tv_postCnt.setText(cnt);
+                    tv_friends_cnt.setText(friendCnt);
 
                     JSONArray postArray = resJsonArray.getJSONArray(1);
                     Log.i("postArray 수", Integer.toString(postArray.length()));
@@ -169,7 +179,7 @@ public class MyAccountFragment extends Fragment {
                         String userId = post.getString("user_id");
                         String date= post.getString("created_date").substring(0,10);
 
-                        imgPath = "http://3.36.92.185"+imgPath;
+                        imgPath = "http://"+server_ip+imgPath;
                         items.add(0, new GridListItem(postId, imgPath, date));
                         adapter.notifyItemInserted(0);
 
@@ -178,6 +188,7 @@ public class MyAccountFragment extends Fragment {
                             @Override
                             public void onItemClick(View v, int position) {
                                 String postId = items.get(position).getId();
+                                UserInfo.getInstance().setClickedId(userId);
                                 Toast.makeText(getActivity(), position+" 번째 아이템", Toast.LENGTH_SHORT).show();
                                 Intent viewPostIntent = new Intent(getContext(), ViewPostActivity.class);
                                 viewPostIntent.putExtra("userId", userId);
@@ -269,8 +280,11 @@ public class MyAccountFragment extends Fragment {
         btn_post = rootView.findViewById(R.id.diary);
         btn_profile = rootView.findViewById(R.id.btn_friend);
         tv_postCnt = rootView.findViewById(R.id.tv_diary_count);
+        tv_friends = rootView.findViewById(R.id.friends_text);
+        tv_friends_cnt = rootView.findViewById(R.id.tv_friends_count);
         iv_profile = rootView.findViewById(R.id.iv_profile);
         tv_profileText = rootView.findViewById(R.id.profile_text);
+        //friends_text
 
         //포스팅 버튼
         btn_post.setOnClickListener(new View.OnClickListener() {
@@ -287,6 +301,18 @@ public class MyAccountFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(),ProfileUploadActivity.class);
+                //startActivityForResult(intent,REQUEST_CODE);
+                //결과값으로 가져올 데이터가 없으므로 새로운 인텐트를 띄어준다.
+                startActivity(intent);
+            }
+        });
+
+        // 친구 리스트 보기
+        tv_friends.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(),FriendListActivity.class);
                 //startActivityForResult(intent,REQUEST_CODE);
                 //결과값으로 가져올 데이터가 없으므로 새로운 인텐트를 띄어준다.
                 startActivity(intent);

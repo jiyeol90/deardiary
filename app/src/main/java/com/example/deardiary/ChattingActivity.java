@@ -176,14 +176,14 @@ public class ChattingActivity extends AppCompatActivity implements View.OnClickL
                             String protocol = read.split(":")[0].trim();
                             String message = read.split(":")[1].trim();
                             if(protocol.equals("initConnect")) {
-                                m_Adapter.add(message, 2);
+                                //m_Adapter.add(message, 2);
                             } else if (protocol.equals("img")) {
                                 //이미지를 보냈을때
 
                             } else if (protocol.equals(userId)) {
                                 m_Adapter.add(message, 1);
                             } else if (protocol.equals("disconnect")) {
-                                m_Adapter.add(message, 2);
+                               // m_Adapter.add(message, 2); //Todo 시현할때는 생략한다.
                             } else {
                                 m_Adapter.add(message, 0);
                             }

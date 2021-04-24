@@ -29,6 +29,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+//로그인 화면
 public class MainActivity extends AppCompatActivity {
 
     MaterialEditText userId, password;

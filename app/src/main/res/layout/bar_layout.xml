@@ -4,9 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@color/colorPrimaryDark"
+    android:background="@color/colorPrimary"
     style="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar"
     app:popupTheme="@style/menustyle"
     android:id="@+id/toolbar">
+
+    <TextView
+        android:id="@+id/toolbar_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="DearDiary" />
 
 </androidx.appcompat.widget.Toolbar>

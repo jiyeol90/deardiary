@@ -43,7 +43,7 @@
                     android:layout_marginLeft="10dp"
                     android:text="닉네임"
                     android:textColor="@color/black"
-                    android:textSize="15dp"
+                    android:textSize="18dp"
                     android:textStyle="bold" />
 
             </LinearLayout>

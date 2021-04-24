@@ -62,9 +62,12 @@ public class ChattingRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         TextView date;
          */
 
-
+        String clickedId = chatRoomitem.getClickedId();
+        if(clickedId.contains("/")) {
+            clickedId = clickedId.replace("/", ", ");
+        }
         ((RoomViewHolder)holder).profile.setImageDrawable(chatRoomitem.getIconDrawable());
-        ((RoomViewHolder)holder).userId.setText(chatRoomitem.getClickedId());
+        ((RoomViewHolder)holder).userId.setText(clickedId);
         ((RoomViewHolder)holder).lastMessage.setText(chatRoomitem.getContent());
         ((RoomViewHolder)holder).date.setText(chatRoomitem.getDate());
 
@@ -99,18 +102,21 @@ public class ChattingRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 //        return listViewChatItemList.get(position);
 //    }
 
-    public void addItem(Drawable iconDrawable, HashMap<String, String> friendMap, String contentType, String content, String date, String clickedId) {
-        ChatRoomItem item = new ChatRoomItem(iconDrawable, friendMap, contentType, content, date) ;
+    public void addItem(Drawable iconDrawable, HashMap<String, String> friendsMap, String contentType, String content, String date, String clickedId, String roomId) {
+        ChatRoomItem item = new ChatRoomItem(iconDrawable, friendsMap, contentType, content, date, roomId) ;
         item.setClickedId(clickedId);
 
-        String friend = "";
-        for(String key : friendMap.keySet()){ //key : value => 상대방 아이디 : 프로필URI
+//        String friend = "";
+//        for(String key : friendMap.keySet()){ //key : value => 상대방 아이디 : 프로필URI
+//
+//            friend += key + "/";
+//            /*
+//            친구 프로필 처리 작성 -> 1명일때 , 그 이상일 경우 처리할 것.
+//             */
+//        }
+//        friend = friend.substring(0, friend.length()-1);
 
-            friend += key;
-            /*
-            친구 프로필 처리 작성 -> 1명일때 , 그 이상일 경우 처리할 것.
-             */
-        }
+
         if(contentType.equals("img")) {
             item.setContent("사진");
         } else {
@@ -118,9 +124,9 @@ public class ChattingRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
 
         //상대방 프로필 사진, 아이디, 메시지 내용, 날짜가 표시된다.
-        item.setIconDrawable(iconDrawable); ;
-        item.setClickedId(friend);
-        item.setDate(date); ;
+        item.setIconDrawable(iconDrawable);
+        item.setClickedId(clickedId);
+        item.setDate(date);
 
         chatRoomitemList.add(item) ;
     }

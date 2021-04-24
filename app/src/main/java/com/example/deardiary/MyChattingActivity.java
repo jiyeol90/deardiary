@@ -1,8 +1,14 @@
 package com.example.deardiary;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
@@ -16,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -48,33 +55,40 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MyChattingActivity extends AppCompatActivity implements View.OnClickListener{
+public class MyChattingActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Handler mHandler;
     Socket socket;
-    private String ip = "3.36.92.185"; // IP 주소
-    private static final String ROOT_URL = "http://3.36.92.185/uploads/chatting_img_upload.php";
+    //private static final String ROOT_URL = "http://15.165.216.38/uploads/chatting_img_upload.php";
     private int port = 10001; // PORT번호
     private PrintWriter out;
     private InputStream inputStream;
     private OutputStream outputStream;
     private BufferedReader input;
 
+    private String server_ip;
+    private String SERVER_URL;
+
+    private String noti_room_id;
+    private String friendList;
     private int CHATTING_ROOM_ID;
     private String initMessage;
 
-    private SimpleDateFormat format = new SimpleDateFormat ( "yyyy-MM-dd HH:mm:ss");
-
+    private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private Calendar time = Calendar.getInstance(); //todo 수정할 것
     private final int GET_GALLERY_IMAGE = 200;
     private final String TAG = "MyChattingActivity";
+    private String userProfile = UserInfo.getInstance().getUserProfile();
+    private String otherProfile = "";
 
     //ListView m_ListView;
     RecyclerView m_RecyclerView;
-   // ChattingListViewAdapter m_Adapter;
+    // ChattingListViewAdapter m_Adapter;
     ChattingListViewAdapter2 m_Adapter;
     EditText et_text;
     Button btn_send;
@@ -84,8 +98,12 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
 
     DataOutputStream dos;
     private String MY_ID = UserInfo.getInstance().getId();
-    private String FRIEND_ID =  UserInfo.getInstance().getClickedId();
+    private String FRIEND_ID = UserInfo.getInstance().getClickedId();
     private String read = null;
+    private String friendsList = "";
+    private String format_time = "";
+    private HashMap<String, String> friendsMap;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,6 +115,9 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
         btn_img = findViewById(R.id.imgButton);
         textView = findViewById(R.id.text);
 
+        server_ip = getString(R.string.server_ip);
+        SERVER_URL = "http://" + server_ip + "/uploads/chatting_img_upload.php";
+
 //      btn_start.setOnClickListener(this);
         btn_send.setOnClickListener(this);
         btn_img.setOnClickListener(this);
@@ -105,9 +126,27 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
         // 커스텀 어댑터 생성
         m_Adapter = new ChattingListViewAdapter2(getApplicationContext());
 
+        m_Adapter.setOnItemClickListener(new ChattingListViewAdapter2.OnItemClickListener() {
+            @Override
+            public void onItemClick(ChattingListViewAdapter2.LeftImageViewHolder holder, View v, int position) {
+                ListViewChatItem item = m_Adapter.getItem(position);
+                Toast.makeText(getApplicationContext(), "선택한 이미지URI : " + item.getImageURI(), Toast.LENGTH_SHORT).show();
+            }
+
+        });
+
+        m_Adapter.setOnItemClickListener(new ChattingListViewAdapter2.OnMyItemClickListener() {
+            @Override
+            public void onItemClick(ChattingListViewAdapter2.RightImageViewHolder holder, View v, int position) {
+                ListViewChatItem item = m_Adapter.getItem(position);
+                Toast.makeText(getApplicationContext(), "나의 이미지URI : " + item.getImageURI(), Toast.LENGTH_SHORT).show();
+            }
+
+        });
+
         // Xml에서 추가한 ListView 연결
         m_RecyclerView = (RecyclerView) findViewById(R.id.recycler_chatting);
-        LinearLayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,false);
+        LinearLayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         //역순으로 출력하기위해 설정한다.
 //        manager.setReverseLayout(true);
 //        manager.setStackFromEnd(true);
@@ -136,24 +175,119 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
             }
         });
 
-        //기존에 만들어 놓은 방이 있는 DB 탐색
-        // 없다면 makeRoom = false;
-        // 있다면 makeRoom = true;
+        /*
+          채팅방으로 들어오는 경로에 따라 4가지로 구분된다.
+          1. 상대방 페이지로 들어가서 1:1 채팅 하기
+          2. 친구리스트에서 친구들을 선택한 후 채팅하기 (1:1 or 단체 채팅)
+          3. 채팅방리스트에서 선택해서 입장하기
+          4. 채팅 알림을 눌러서 입장하기
+        */
+
+        //FriendListActivity 에서 친구리스트를 통해 입장한다. (2번에 해당)
+        Intent friendsIntent = getIntent();
+
+        if (friendsIntent.hasExtra("friends")) {
+            ArrayList<String> friends = (ArrayList<String>) friendsIntent.getSerializableExtra("friends");
+            if (friends != null) {
+                //Toast.makeText(getApplicationContext(), "전달받은 이름 리스트 갯수 : " + friends.size(), Toast.LENGTH_LONG).show();
+                int i;
+                for (i = 0; i < friends.size() - 1; i++) {
+                    String append = friends.get(i) + "/";
+                    friendsList += append;
+                }
+                friendsList += friends.get(i); //친구들 리스트
+
+                UserInfo.getInstance().setClickedId(friendsList);
+                FRIEND_ID = UserInfo.getInstance().getClickedId();
+                // 위에서 선언한 값을 재설정 해준다. (위에서 초기화 해 줄때는 1:1 대화방으로 넘어갈때 상대 계정의 버튼을 누르고 들어온다는 전제였으므로)
+
+                Toast.makeText(getApplicationContext(), "FriendsList : " + friendsList, Toast.LENGTH_LONG).show();
+            }
+            //채팅 알림(notification)을 통해서 입장한다.(4번에 해당)
+        } else if (friendsIntent.hasExtra("direct")) {
+            noti_room_id = UserInfo.getInstance().getRoomId(); //사용하지 않는듯
+            friendList = UserInfo.getInstance().getClickedId();
+
+            findFriendMap(friendList);
+            //채팅방리스트를 통해서 입장한다.(3번에 해당)
+        } else if (friendsIntent.hasExtra("friendsMap")) {
+            friendsMap = (HashMap<String, String>) friendsIntent.getSerializableExtra("friendsMap");
+        }
+
 
         //상대방과 대화한 방이 있는지 검색한 후 ConnectThread를 실행한다.
         loadChatRoomData();
 //        ConnectThread th =new ConnectThread();
 //        th.start();
+    }
+
+    //noti로 들어오면 상대방 (한명 혹은 여러명) 의 아이디와 프로필을 hashmap으로 저장하기 위한 통신
+    private void findFriendMap(String friendList) {
+
+        SERVER_URL = "http://"+server_ip+"/chattingdata/noti_friends_map.php";
+
+        friendsMap = new HashMap<>();
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, SERVER_URL, new Response.Listener<String>() {
+            //volley 라이브러리의 GET방식은 버튼 누를때마다 새로운 갱신 데이터를 불러들이지 않음. 그래서 POST 방식 사용
+            @Override
+            public void onResponse(String response) {
+
+                try {
+                    JSONArray resJsonArray = new JSONArray(response);
+
+                    for (int i = 0; i < resJsonArray.length(); i++) {
+                        JSONObject jsonObject = resJsonArray.getJSONObject(i);
+
+                        String friendId = jsonObject.getString("user_id");
+                        String profileSrc = jsonObject.getString("user_profile");
+
+                        Log.d("friendList", "friendId : " + friendId + ", profileSrc : " + profileSrc);
+
+                        friendsMap.put(friendId, profileSrc);
+
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Toast.makeText(getApplicationContext(), "response", Toast.LENGTH_SHORT).show();
+
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(), "ERROR", Toast.LENGTH_SHORT).show();
+            }
+
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String, String> param = new HashMap<>();
+
+                //String postId = UserInfo.getInstance().getId();
+                param.put("friends", friendList);
+
+                return param;
+            }
+        };
+
+        //실제 요청 작업을 수행해주는 요청큐 객체 생성
+        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+
+        //요청큐에 요청 객체 생성
+        requestQueue.add(stringRequest);
 
     }
+
 
     private void loadChatRoomData() {
         {
 //            String myId = UserInfo.getInstance().getId();
 //            String friendId = UserInfo.getInstance().getClickedId();
 
-            String SERVER_URL = "http://3.36.92.185/chattingdata/load_room_data.php";
-
+            //String SERVER_URL = "http://3.36.92.185/chattingdata/load_room_data.php";
+            SERVER_URL = "http://"+server_ip+"/chattingdata/load_room_data.php";
 
             // 나와 상대가 대화중인 방이 있는지 roomId를 얻어온 후
             // 그동안 대화한 내용을 뿌려준다.
@@ -187,8 +321,6 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
                     }
                     //BusProvider.getInstance().post(new BusEvent(true));
 
-
-
                 }
             }, new Response.ErrorListener() {
                 @Override
@@ -202,21 +334,18 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
                 {
                     HashMap<String, String> param = new HashMap<>();
 
-
                     //String postId = UserInfo.getInstance().getId();
-                    param.put("myId", MY_ID); //todo roomId 를 String? int?
+                    param.put("myId", MY_ID);
                     param.put("friendId", FRIEND_ID);
-
                 /*
                 CHATTING_ROOM_ID = Integer.parseInt(roomId);
-        String senderUserId = filter[1];
-        String contentType = filter[2];
-        String content = filter[3];
+                String senderUserId = filter[1];
+                String contentType = filter[2];
+                String content = filter[3];
 
-         String myId = UserInfo.getInstance().getId();
-            String friendId = UserInfo.getInstance().getClickedId();
+                String myId = UserInfo.getInstance().getId();
+                String friendId = UserInfo.getInstance().getClickedId();
                  */
-
                     return param;
                 }
             };
@@ -232,7 +361,7 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
 
     void loadChatMessage(String roomId) {
         {
-            String SERVER_URL = "http://3.36.92.185/chattingdata/load_message_data.php";
+            SERVER_URL = "http://"+server_ip+"/chattingdata/load_message_data.php";
 
             // 나와 상대가 대화중인 방이 있는지 roomId를 얻어온 후
             // 그동안 대화한 내용을 뿌려준다.
@@ -266,25 +395,34 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
                                     m_Adapter.addItem(content, created_date); ///uploads/post_images/161426010420200731_185544.jpg
                                 } else {
                                 //이미지 메시지
-                                    m_Adapter.addImageItem("http://3.36.92.185"+content, created_date);
+                                    m_Adapter.addImageItem("http://"+server_ip+content, created_date);
                                 }
                             } else {
                                 //상대방이 보낸 메시지
                                 if(content_type.equals("txt")) {
-                                    m_Adapter.addItem(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_profile_default), user_id, content, created_date); ///uploads/post_images/161426010420200731_185544.jpg
+                                   // m_Adapter.addItem(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_profile_default), user_id, content, created_date); ///uploads/post_images/161426010420200731_185544.jpg
+                                    if(user_profile.equals("null") || user_profile.equals("default")) {
+                                        user_profile = "/uploads/profile_images/default_profile.jpg";
+                                    }
+                                    m_Adapter.addItem("http://"+server_ip+user_profile, user_id, content, created_date); ///uploads/profile_images/161426010420200731_185544.jpg
                                 } else {
                                     //이미지 메시지
-                                    m_Adapter.addImageItem(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_profile_default), user_id, "http://3.36.92.185"+content, created_date);
+                                    if(user_profile.equals("null") || user_profile.equals("default")) {
+                                        user_profile = "/uploads/profile_images/default_profile.jpg";
+                                    }
+                                    m_Adapter.addImageItem("http://"+server_ip+user_profile, user_id, "http://"+server_ip+content, created_date);
                                 }
                             }
 
                             m_Adapter.notifyDataSetChanged();
                             //ArrayList의 크기의 index 위치로 포지셔닝.
-                            m_RecyclerView.scrollToPosition(m_Adapter.getItemCount()-1);
+//                            m_RecyclerView.scrollToPosition(m_Adapter.getItemCount());
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+
+                    m_RecyclerView.scrollToPosition(m_Adapter.getItemCount());
                     //위치에 대해 고민해봐야 한다.
                     ConnectThread th =new ConnectThread();
                     th.start();
@@ -325,7 +463,7 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
         public void run() {
             try {
                 //소켓 생성
-                InetAddress serverAddr = InetAddress.getByName(ip);
+                InetAddress serverAddr = InetAddress.getByName(server_ip);
                 socket = new Socket(serverAddr, port);
                 //입력 메시지
                 //처음 연결할때만 아이디를 보내준다.
@@ -353,10 +491,10 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
                 out.flush();
 
 
-
                 while ((read = input.readLine()) != null) {
 
                     String[] filter = read.split("@");
+
 
                     String roomId = filter[0];
                     CHATTING_ROOM_ID = Integer.parseInt(roomId);
@@ -364,17 +502,25 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
                     String contentType = filter[2];
                     String content = filter[3];
 
+//                    String format_time = "";  -> 이부분이 왜 문제가 되는거지? content변수도 문제가 없는데.
+                    if(filter.length == 5) {
+                        format_time = filter[4];
+
+                    }
 
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             //현재 시간 구하기
 
-                            Calendar time = Calendar.getInstance();
-                            String format_time = format.format(time.getTime());
+//                            Calendar time = Calendar.getInstance();
+//                            format_time = format.format(time.getTime());
                             //1. 처음접속할때 뿌려줄 메시지 "[id] 님이 접속하였습니다."
                             //2. 내가 쓴 메시지 "imgj : [내 id] : 메시지 내용"
                             //3. 상태방이 쓴 메시지 "[상대방 id] : 메시지 내용"
+
+                            //java.lang.NumberFormatException: For input string: "" -> 로그를 찍어주는것이 오류의 원인이 된다.
+                            //   Log.d("디버그태그", format_time);
 
                             if(contentType.equals("initConnectAndMakeRoom")) {
                                 //DB에 생성된 방을 insert한다
@@ -382,21 +528,31 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
                             }
                             else if(contentType.equals("initConnect")) {
                                // m_Adapter.add(message, 2);
-                                m_Adapter.addItem(content);
-                            } else if (contentType.equals("img")) {
+                               // m_Adapter.addItem(content);
+                            } else if (contentType.equals("img")) { //이미지를 보냈을때
                                 //이미지를 보냈을때
                                     if(senderUserId.equals(MY_ID)) {
-                                        m_Adapter.addImageItem("http://3.36.92.185"+content, format_time); ///uploads/post_images/161426010420200731_185544.jpg
+                                        m_Adapter.addImageItem("http://"+server_ip+content, format_time); ///uploads/post_images/161426010420200731_185544.jpg
                                     } else {
-                                        m_Adapter.addImageItem(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_profile_default), senderUserId, "http://3.36.92.185"+ content, format_time);
+                                        otherProfile = friendsMap.get(senderUserId);
+                                        if(otherProfile.equals("null") || otherProfile.equals("default")) {
+                                            otherProfile = "/uploads/profile_images/default_profile.jpg";
+                                        }
+                                        m_Adapter.addImageItem("http://"+server_ip+otherProfile, senderUserId, "http://"+server_ip+ content, format_time);
                                     }
 
-                            } else if (senderUserId.equals(MY_ID)) {
+                            } else if (senderUserId.equals(MY_ID)) { //텍스트? 뭐지?
                                 m_Adapter.addItem(content, format_time);
                             } else if (contentType.equals("disconnect")) {
-                                m_Adapter.addItem(content);
+                               // m_Adapter.addItem(content);
                             } else {
-                                m_Adapter.addItem(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_profile_default), senderUserId, content, format_time);//todo  protocol 수정할것
+                                otherProfile = friendsMap.get(senderUserId); //여기서 jiyeol90의 프로필이 james로 변경된다. -> userProfile -> otherProfile로 변경
+                               //m_Adapter.addItem(ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_profile_default), senderUserId, content, format_time);//todo  protocol 수정할것
+                                if(otherProfile.equals("null") || otherProfile.equals("default")) {
+                                    otherProfile = "/uploads/profile_images/default_profile.jpg";
+                                }
+                                m_Adapter.addItem("http://"+server_ip+otherProfile, senderUserId, content, format_time);
+                                //todo 상대방이 메시지를 보내면 상대방의 프로필을 띄어줘야 하는데 이 엑티비티에는 나의 프로필 정보밖에 없다. 
                             }
                             m_Adapter.notifyDataSetChanged();
                             //ArrayList의 크기의 index 위치로 포지셔닝.
@@ -421,8 +577,7 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
 
     private void uploadChatMessage(String message) {
 
-        String SERVER_URL = "";
-
+        //String SERVER_URL = "";
 
         //메시지에 따라 DB저장하는 방법을 다르게 한다.
         //* initMessageAndMakeRoom  : 방을 insert 하고 -> participate_in 에 insert (트랜잭션)
@@ -442,12 +597,12 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
 
 
         if(contentType.equals("initConnectAndMakeRoom")) { //1.처음 방을 만들고 입장할 때
-            SERVER_URL = "http://3.36.92.185/chattingdata/chatroom_upload.php";
+            SERVER_URL = "http://"+server_ip+"/chattingdata/chatroom_upload.php";
         } else if(contentType.equals("initConnect")) { // 2.만들어진 방에 처음 입장할때
-            SERVER_URL = "http://3.36.92.185/chattingdata/participate_in_upload.php";
+            SERVER_URL = "http://"+server_ip+"/chattingdata/participate_in_upload.php";
         } else if (contentType.equals("txt") || contentType.equals("img")){
             if(senderUserId.equals(MY_ID)) {
-                SERVER_URL = "http://3.36.92.185/chattingdata/message_upload.php";
+                SERVER_URL = "http://"+server_ip+"/chattingdata/message_upload.php";
             } else {
                 return;
             }
@@ -456,14 +611,12 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
             return;
         }
 
-
-
         StringRequest stringRequest = new StringRequest(Request.Method.POST, SERVER_URL, new Response.Listener<String>() {
             //volley 라이브러리의 GET방식은 버튼 누를때마다 새로운 갱신 데이터를 불러들이지 않음. 그래서 POST 방식 사용
             @Override
             public void onResponse(String response) {
 
-                Toast.makeText(getApplicationContext(), response,Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), response,Toast.LENGTH_SHORT).show();
 
                 //BusProvider.getInstance().post(new BusEvent(true));
             }
@@ -486,7 +639,9 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
                 param.put("friendId", friendId);
                 param.put("contentType", contentType);
                 param.put("content", content);
+                param.put("time", format_time);
 
+                Log.d("message", "\nroomId : " + roomId + "\nmyId :" + senderUserId + "\nfriendId : " + friendId + "\ncontentType : " + contentType + ", \ncontent : " + content);
                 /*
                 CHATTING_ROOM_ID = Integer.parseInt(roomId);
                 String senderUserId = filter[1];
@@ -541,7 +696,8 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
 
     private void userStatusUpdate() {
 
-        String SERVER_URL = "http://3.36.92.185/chattingdata/user_status_upload.php";
+        //String SERVER_URL = "http://3.36.92.185/chattingdata/user_status_upload.php";
+        SERVER_URL = "http://"+server_ip+"/chattingdata/user_status_upload.php";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, SERVER_URL, new Response.Listener<String>() {
             //volley 라이브러리의 GET방식은 버튼 누를때마다 새로운 갱신 데이터를 불러들이지 않음. 그래서 POST 방식 사용
             @Override
@@ -590,19 +746,22 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
     public void onClick(View v) {
         String message;
 
+        //format_time = format.format(time.getTime()); //메시지를 보내는 시점의 시간을 저장한다.
         switch (v.getId()) {
             case R.id.sendButton:
                 if(out == null) return;
-
+                time = Calendar.getInstance();
+                format_time = format.format(time.getTime()); //메시지를 보내는 시점의 시간을 저장한다.
                 message= et_text.getText().toString();
                 //개행문자 처리
                 message = message.replaceAll(System.getProperty("line.separator"), " ");
-                message = CHATTING_ROOM_ID + "@" + MY_ID + "@" + "txt" + "@" + message;
+                message = CHATTING_ROOM_ID + "@" + MY_ID + "@" + "txt" + "@" + message + "@" + format_time;
                 SendThread st = new SendThread(message, out);
                 st.start();
 
                 break;
             case R.id.imgButton:
+
                 Intent intent = new Intent(Intent.ACTION_PICK);
                 intent.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 intent.setType("image/*");
@@ -647,20 +806,33 @@ public class MyChattingActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void sendImageFile(final String filePath, final String userId) {
-        SimpleMultiPartRequest smpr= new SimpleMultiPartRequest(Request.Method.POST, ROOT_URL, new Response.Listener<String>() {
+        SERVER_URL = "http://"+server_ip+"/uploads/chatting_img_upload.php";
+
+        time = Calendar.getInstance();
+        format_time = format.format(time.getTime()); //메시지를 보내는 시점의 시간을 저장한다.
+
+        SimpleMultiPartRequest smpr= new SimpleMultiPartRequest(Request.Method.POST, SERVER_URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 //new AlertDialog.Builder(DiaryPostActivity.this).setMessage("응답:"+response).create().show();
                 //데이를 보낼 곳에 Boolean 값을 준다.
+
                 try {
                     JSONObject obj = new JSONObject(response);
+                    if(obj.length() <= 3) {
+                        String error = obj.getString("error");
+                        String file_name = obj.getString("file_name");
+                        Toast.makeText(getApplicationContext(), error,Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), file_name,Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     String image_path = obj.getString("file_path");
                     String image_width = obj.getString("file_width");
                     String image_height = obj.getString("file_height");
 
                     Log.d("image width, height", image_width + " , " + image_height);
 
-                    String message =  CHATTING_ROOM_ID + "@" + userId + "@" + "img" +"@"+ image_path;
+                    String message =  CHATTING_ROOM_ID + "@" + userId + "@" + "img" +"@"+ image_path + "@" + format_time;
                     SendThread st = new SendThread(message, out);
                     st.start();
 

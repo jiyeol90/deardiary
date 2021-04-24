@@ -11,11 +11,12 @@ public class UserInfo {
 
     private String index;
     private String id;
+    private String roomId = "";
     private String userName;
     private String clickedId = "";
     //사용자가 나중에 입력해줄 값들은 초기화 해준다.
     private String userText = "";
-    private String userProfile = "";
+    private String userProfile = "default"; //초기값으로 default를 설정해 준다.
     private boolean isTokenSaved = false;
     private String token;
 
@@ -74,4 +75,8 @@ public class UserInfo {
     public String getToken() { return token; }
 
     public void setToken(String token) { this.token = token; }
+
+    public String getRoomId() { return roomId; }
+
+    public void setRoomId(String roomId) { this.roomId = roomId; }
 }

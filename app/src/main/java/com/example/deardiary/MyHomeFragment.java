@@ -30,11 +30,11 @@ import java.util.ArrayList;
 public class MyHomeFragment extends Fragment {
 
     RecyclerView recyclerView;
-
     PostItem item;
     ArrayList<PostItem> items= new ArrayList<>();
-
     PostAdapter adapter;
+    private String server_ip;
+    private String SERVER_URL;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -43,17 +43,17 @@ public class MyHomeFragment extends Fragment {
         adapter= new PostAdapter(getActivity(), items);
 
         // Inflate the layout for this fragment
-
+        server_ip = getString(R.string.server_ip);
         //서버의 loadDBtoJson.php파일에 접속하여 (DB데이터들)결과 받기
         //Volley+ 라이브러리 사용
 
         //서버주소
-        String serverUrl="http://3.36.92.185/loadingdata/load_post.php";
+        SERVER_URL="http://"+server_ip+"/loadingdata/load_post.php";
 
         //결과를 JsonArray 받을 것이므로..
         //StringRequest가 아니라..
         //JsonArrayRequest를 이용할 것임
-        JsonArrayRequest jsonArrayRequest= new JsonArrayRequest(Request.Method.POST, serverUrl, null, new Response.Listener<JSONArray>() {
+        JsonArrayRequest jsonArrayRequest= new JsonArrayRequest(Request.Method.POST, SERVER_URL, null, new Response.Listener<JSONArray>() {
             //volley 라이브러리의 GET방식은 버튼 누를때마다 새로운 갱신 데이터를 불러들이지 않음. 그래서 POST 방식 사용
             @Override
             public void onResponse(JSONArray response) {
@@ -78,10 +78,10 @@ public class MyHomeFragment extends Fragment {
                         if(userProfile.equals("null")) {
                             userProfile = "default";
                         } else {
-                            userProfile = "http://3.36.92.185"+userProfile;
+                            userProfile = "http://"+server_ip+userProfile;
                         }
                         //이미지 경로의 경우 서버 IP가 제외된 주소이므로(uploads/xxxx.jpg) 바로 사용 불가.
-                        imgPath = "http://3.36.92.185"+imgPath;
+                        imgPath = "http://"+server_ip+imgPath;
 
                         items.add(0, new PostItem(no, name, userProfile, imgPath, date)); // 첫 번째 매개변수는 몇번째에 추가 될지, 제일 위에 오도록
                         //adapter.notifyDataSetChanged();

@@ -56,9 +56,13 @@
                 android:id="@+id/iv_comment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginStart="215dp"
                 android:layout_marginLeft="70dp"
-                android:layout_toEndOf="@+id/diary_date"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="14dp"
                 android:src="@drawable/ic_comment" />
 
             <TextView
@@ -77,7 +81,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="45dp"
+                android:layout_marginLeft="40dp"
                 android:layout_toEndOf="@+id/iv_comment"
                 android:src="@drawable/ic_view_post" />
 
@@ -93,20 +97,41 @@
                 android:textStyle="bold" />
 
             <ToggleButton
-                android:id="@+id/tbn_heart"
+                android:id="@+id/button_favorite"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
-                android:layout_marginLeft="40dp"
                 android:layout_centerVertical="true"
-                android:layout_toRightOf="@id/iv_view"
-                android:background="@drawable/ic_heart_border"
+                android:layout_marginStart="40dp"
+                android:layout_marginLeft="40dp"
+                android:background="@drawable/button_favorite"
                 android:checked="false"
                 android:text=""
                 android:textOff=""
-                android:textOn="" />
+                android:textOn=""
+                android:layout_toEndOf="@+id/iv_view"
+                android:layout_toRightOf="@id/iv_view" />
 
         </RelativeLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:text="좋아요"
+                />
+            <TextView
+                android:id="@+id/tv_likeCnt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:text="12 "
+                />
+
+        </LinearLayout>
 
         <EditText
             android:id="@+id/comment_text"

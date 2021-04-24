@@ -59,7 +59,7 @@ public class ProfileUploadActivity extends AppCompatActivity implements Button.O
 
     private String profileSrc;
     private String profileText;
-    private String absoultePath;
+    private String absolutePath;
 
     private File photoFile;
     private String imageFilePath;
@@ -277,15 +277,16 @@ public class ProfileUploadActivity extends AppCompatActivity implements Button.O
 
                 {
 
-                    Bitmap photo = extras.getParcelable("data"); // CROP된 BITMAP
-
+                    //Bitmap photo = (Bitmap)extras.getParcelable("data"); // CROP된 BITMAP
+                    Bitmap photo = (Bitmap)extras.get("data"); // CROP된 BITMAP
+                    //Bundle[{src_uri=content://media/external/images/media/1215, data=android.graphics.Bitmap@6969cd4}]
                     iv_UserPhoto.setImageBitmap(photo); // 레이아웃의 이미지칸에 CROP된 BITMAP을 보여줌
 
 
                     storeCropImage(photo, filePath); // CROP된 이미지를 외부저장소, 앨범에 저장한다.
 
-                    absoultePath = filePath;
-                    Log.i("경로 in OnActivityResult", filePath);
+                    absolutePath = filePath;
+                    Log.d("filePath", filePath);
                     btn_save.setVisibility(View.VISIBLE);
                     break;
 
@@ -409,8 +410,8 @@ public class ProfileUploadActivity extends AppCompatActivity implements Button.O
             smpr.addStringParam("userText", userText);
             //이미지 파일 추가
             //기존 이미지를 저장하기 누른다면 따로 저장해줄 필요가 없다.
-            if(!TextUtils.isEmpty(absoultePath)) {
-                smpr.addFile("image", absoultePath);
+            if(!TextUtils.isEmpty(absolutePath)) {
+                smpr.addFile("image", absolutePath);
             }
 
             //요청객체를 서버로 보낼 우체통 같은 객체 생성
@@ -431,13 +432,15 @@ public class ProfileUploadActivity extends AppCompatActivity implements Button.O
         // SmartWheel 폴더를 생성하여 이미지를 저장하는 방식이다.
 
         String dirPath = Environment.getExternalStorageDirectory().getAbsolutePath()+"/SmartWheel";
-
+        ///storage/emulated/0/SmartWheel/1615953495180.jpg
         File directory_SmartWheel = new File(dirPath);
 
 
-        if(!directory_SmartWheel.exists()) // SmartWheel 디렉터리에 폴더가 없다면 (새로 이미지를 저장할 경우에 속한다.)
+        if(!directory_SmartWheel.exists()) { // SmartWheel 디렉터리에 폴더가 없다면 (새로 이미지를 저장할 경우에 속한다.)
 
             directory_SmartWheel.mkdir();
+
+        }
 
 
         File copyFile = new File(filePath);
@@ -463,7 +466,7 @@ public class ProfileUploadActivity extends AppCompatActivity implements Button.O
             //ex) content://media/external/images/media/2874
             filePath = (Uri.fromFile(copyFile).toString()).substring(7);
 
-            //Log.i("크롭된 이미지 절대 경로", Uri.fromFile(copyFile).toString());
+            Log.i("크롭된 이미지 절대 경로", Uri.fromFile(copyFile).toString());
             Log.i("경로 in storeCropImage", filePath);
 
             out.flush();

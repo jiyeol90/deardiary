@@ -54,6 +54,9 @@ public class OtherAccountFragment extends Fragment {
     private Button btn_chatting;
     private Button btn_profile;
     private ImageView iv_post;
+    private String server_ip;
+    private String SERVER_URL;
+    private HashMap<String, String> friendsMap = new HashMap<>();
 
     GridLayoutManager layoutManager;
     GridView gridView;
@@ -62,7 +65,8 @@ public class OtherAccountFragment extends Fragment {
     ArrayList<GridListItem> items= new ArrayList<>();
 
     GridListAdapter adapter;
-
+    private String MY_ID = UserInfo.getInstance().getId();
+    private String FRIEND_ID = UserInfo.getInstance().getClickedId();
 
     //이벤트 버스 등록
     @Override
@@ -78,7 +82,7 @@ public class OtherAccountFragment extends Fragment {
         Log.d("생명주기 :", "onViewCreated()");
         rcv_grid = view.findViewById(R.id.grid_view);
 
-
+        server_ip = getString(R.string.server_ip);
         //userindex값을 받아서 Volley의 JsonArrayRequest로 보낸다.
         String userIndex = UserInfo.getInstance().getIndex();
 
@@ -119,9 +123,9 @@ public class OtherAccountFragment extends Fragment {
         progressDialog.setTitle("Loading My Page");
         progressDialog.show();
 
-        String serverUrl="http://3.36.92.185/loadingdata/otherpage_load.php";
+        SERVER_URL="http://"+server_ip+"/loadingdata/otherpage_load.php";
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, serverUrl, new Response.Listener<String>() {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, SERVER_URL, new Response.Listener<String>() {
             //volley 라이브러리의 GET방식은 버튼 누를때마다 새로운 갱신 데이터를 불러들이지 않음. 그래서 POST 방식 사용
             @Override
             public void onResponse(String response) {
@@ -141,7 +145,9 @@ public class OtherAccountFragment extends Fragment {
                     String cnt = upperMypage.getString("postCnt");
                     String friendOrNot = upperMypage.getString("friendOrNot");
                     Log.i("포스팅 개수", cnt);
-
+                    //대화할 상대편의 아이디와 프로필을 담는다.
+                    String friendId = FRIEND_ID;
+                    friendsMap.put(FRIEND_ID, imageSrc);
                     /*
                      * 기본이미지일 경우의 response 값 ("default")
                      * 프로필 문구만 입력되어있는 경우 response값 (null)
@@ -152,7 +158,7 @@ public class OtherAccountFragment extends Fragment {
                         //UserInfo 객체에 이미지 경로 필드에 저장한다.
                         UserInfo.getInstance().setUserProfile(imageSrc);
                         //서버에서 저장된 이미지 url
-                        imageSrc = "http://3.36.92.185"+imageSrc;
+                        imageSrc = "http://"+server_ip+imageSrc;
                         Glide.with(OtherAccountFragment.this).load(imageSrc).into(iv_profile);
                     }
                     if(!profileText.equals("default") && !profileText.equals("null")) {
@@ -170,6 +176,11 @@ public class OtherAccountFragment extends Fragment {
                         btn_friend.setText("친구끊기");
 //                        btn_friend.setClickable(false);
                         btn_chatting.setVisibility(View.VISIBLE);
+                    } else {
+                        btn_friend.setBackgroundColor(Color.parseColor("#6200EE"));
+                        btn_friend.setText("친구하기");
+                        //btn_friend.setClickable(false);
+                        btn_chatting.setVisibility(View.GONE);
                     }
 
 
@@ -182,7 +193,7 @@ public class OtherAccountFragment extends Fragment {
                         String userId = post.getString("user_id");
                         String date= post.getString("created_date").substring(0,10);
 
-                        imgPath = "http://3.36.92.185"+imgPath;
+                        imgPath = "http://"+server_ip+imgPath;
                         items.add(0, new GridListItem(postId, imgPath, date));
                         adapter.notifyItemInserted(0);
 
@@ -193,7 +204,7 @@ public class OtherAccountFragment extends Fragment {
                                 String postId = items.get(position).getId();
                                 Toast.makeText(getActivity(), position+" 번째 아이템", Toast.LENGTH_SHORT).show();
                                 Intent viewPostIntent = new Intent(getContext(), ViewPostActivity.class);
-                                viewPostIntent.putExtra("userId", userId);
+                                viewPostIntent.putExtra("userId", MY_ID);//Todo
                                 viewPostIntent.putExtra("postId", postId);
                                 startActivity(viewPostIntent);
 
@@ -298,8 +309,8 @@ public class OtherAccountFragment extends Fragment {
             public void onClick(View v) {
 //                Intent chatIntent = new Intent(getContext(), ChattingActivity.class);
 //                startActivity(chatIntent);
-
                 Intent chatIntent = new Intent(getContext(), MyChattingActivity.class);
+                chatIntent.putExtra("friendsMap", friendsMap);
                 startActivity(chatIntent);
                 //채팅화면 띄어주기
             }
@@ -317,7 +328,7 @@ public class OtherAccountFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         makeFriend("cancel");
-                        Toast.makeText(getActivity(), "친구를 끊었습니다.", Toast.LENGTH_SHORT).show();
+
                     }
                 })
                 .setNegativeButton("아니오", new DialogInterface.OnClickListener() {
@@ -332,7 +343,7 @@ public class OtherAccountFragment extends Fragment {
 
     private void makeFriend(String friendId) {
 
-        String serverUrl = "";
+        //String serverUrl = "";
 
         final ProgressDialog progressDialog = new ProgressDialog(getContext());
         progressDialog.setCancelable(false);
@@ -341,12 +352,12 @@ public class OtherAccountFragment extends Fragment {
         progressDialog.show();
 
         if(friendId.equals("cancel")) {
-            serverUrl = "http://3.36.92.185/uploads/friend_cancel_upload.php";
+            SERVER_URL = "http://"+server_ip+"/uploads/friend_cancel_upload.php";
         } else {
-            serverUrl = "http://3.36.92.185/uploads/friend_upload.php";
+            SERVER_URL = "http://"+server_ip+"/uploads/friend_upload.php";
         }
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, serverUrl, new Response.Listener<String>() {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, SERVER_URL, new Response.Listener<String>() {
             //volley 라이브러리의 GET방식은 버튼 누를때마다 새로운 갱신 데이터를 불러들이지 않음. 그래서 POST 방식 사용
             @Override
             public void onResponse(String response) {
@@ -363,6 +374,8 @@ public class OtherAccountFragment extends Fragment {
                     btn_friend.setText("친구하기");
                     //btn_friend.setClickable(false);
                     btn_chatting.setVisibility(View.GONE);
+
+                    Toast.makeText(getActivity(), "친구를 끊었습니다.", Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -379,8 +392,8 @@ public class OtherAccountFragment extends Fragment {
                 HashMap<String, String> param = new HashMap<>();
 
                 String userId = UserInfo.getInstance().getId();
-                param.put("userId", userId);
-                param.put("friendId", friendId);
+                param.put("userId", MY_ID);
+                param.put("friendId", FRIEND_ID);
 
                 return param;
             }

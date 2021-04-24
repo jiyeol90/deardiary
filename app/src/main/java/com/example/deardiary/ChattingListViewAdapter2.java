@@ -1,4 +1,5 @@
 package com.example.deardiary;
+import android.widget.Toast;
 import com.bumptech.glide.Glide;
 
 import android.content.Context;
@@ -24,11 +25,35 @@ public class ChattingListViewAdapter2 extends RecyclerView.Adapter<RecyclerView.
     private static final int ITEM_VIEW_IMAGE_TYPE_MINE = 3 ;
     private static final int ITEM_VIEW_TYPE_INOUT = 4 ;
 
+    // 리스너 객체 참조를 저장하는 변수
+    private OnItemClickListener mListener = null;
+    private OnMyItemClickListener myListener = null;
+
     private ArrayList<ListViewChatItem> listViewChatItemList = new ArrayList<ListViewChatItem>() ;
     private Context context;
 
     public ChattingListViewAdapter2(Context context) {
         this.context = context;
+    }
+
+    //커스텀 리스너 인터페이스 정의
+    public interface OnItemClickListener {
+        void onItemClick(ChattingListViewAdapter2.LeftImageViewHolder holder, View v, int position) ;
+    }
+
+    //커스텀 리스너 인터페이스 정의
+    public interface OnMyItemClickListener {
+        void onItemClick(ChattingListViewAdapter2.RightImageViewHolder holder, View v, int position) ;
+    }
+
+    // OnItemClickListener 리스너 객체 참조를 어댑터에 전달하는 메서드
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.mListener = listener ;
+    }
+
+    // OnItemClickListener 리스너 객체 참조를 어댑터에 전달하는 메서드
+    public void setOnItemClickListener(OnMyItemClickListener listener) {
+        this.myListener = listener ;
     }
 
     @NonNull
@@ -82,7 +107,15 @@ public class ChattingListViewAdapter2 extends RecyclerView.Adapter<RecyclerView.
                     dateTextView.setText(listViewItem.getDate());
          */
         if(holder instanceof LeftTextViewHolder) {
-            ((LeftTextViewHolder)holder).profile.setImageDrawable(listViewItem.getIconDrawable());
+            //((LeftTextViewHolder)holder).profile.setImageDrawable(listViewItem.getIconDrawable());
+            Glide.with(holder.itemView.getContext()) //해당 환경의 Context나 객체 입력
+                    .load(listViewItem.getUserProfileURI()) //URL, URI 등등 이미지를 받아올 경로
+                    .override(90,90)
+                    .into(((LeftTextViewHolder) holder).profile); //받아온 이미지를 받을 공간(ex. ImageView)
+
+
+
+
             ((LeftTextViewHolder)holder).userId.setText(listViewItem.getUserId());
             ((LeftTextViewHolder)holder).message.setText(listViewItem.getMessage());
             //((LeftTextViewHolder)holder).message.setBackgroundResource(R.drawable.inbox2);
@@ -104,7 +137,12 @@ public class ChattingListViewAdapter2 extends RecyclerView.Adapter<RecyclerView.
             ((RightTextViewHolder)holder).date.setText(listViewItem.getDate());
         } else if(holder instanceof LeftImageViewHolder) {
 
-            ((LeftImageViewHolder) holder).profile.setImageDrawable(listViewItem.getIconDrawable());
+            //((LeftImageViewHolder) holder).profile.setImageDrawable(listViewItem.getIconDrawable());
+            Glide.with(holder.itemView.getContext()) //해당 환경의 Context나 객체 입력
+                    .load(listViewItem.getUserProfileURI()) //URL, URI 등등 이미지를 받아올 경로
+                    .override(90,90)
+                    .into(((LeftImageViewHolder) holder).profile); //받아온 이미지를 받을 공간(ex. ImageView)
+
             ((LeftImageViewHolder) holder).userId.setText(listViewItem.getUserId());
             ((LeftImageViewHolder) holder).image.setImageResource(R.drawable.ic_chatting);
 
@@ -135,6 +173,9 @@ public class ChattingListViewAdapter2 extends RecyclerView.Adapter<RecyclerView.
 //        return ITEM_VIEW_TYPE_MAX ;
 //    }
 
+    public ListViewChatItem getItem(int position) {
+        return listViewChatItemList.get(position);
+    }
     // position 위치의 아이템 타입 리턴.
     @Override
     public int getItemViewType(int position) {
@@ -218,15 +259,17 @@ public class ChattingListViewAdapter2 extends RecyclerView.Adapter<RecyclerView.
 //    }
 
 
-    public void addItem(Drawable iconDrawable, String userId, String message, String date) {
+    public void addItem(String userProfile, String userId, String message, String date) {
         ListViewChatItem item = new ListViewChatItem() ;
 
         //상대방 프로필 사진, 아이디, 메시지 내용, 날짜가 표시된다.
         item.setType(ITEM_VIEW_TEXT_TYPE_OTHER) ;
-        item.setIconDrawable(iconDrawable); ;
+        //item.setIconDrawable(iconDrawable);
+        item.setUserProfileURI(userProfile);
+
         item.setUserId(userId);
         item.setMessage(message);
-        item.setDate(date); ;
+        item.setDate(date);
 
         listViewChatItemList.add(item) ;
     }
@@ -243,15 +286,16 @@ public class ChattingListViewAdapter2 extends RecyclerView.Adapter<RecyclerView.
         listViewChatItemList.add(item);
     }
 
-    public void addImageItem(Drawable iconDrawable, String userId, String imageURI, String date) {
+    public void addImageItem(String userProfile, String userId, String imageURI, String date) {
         ListViewChatItem item = new ListViewChatItem() ;
 
         //상대방 프로필 사진, 아이디, 메시지 내용, 날짜가 표시된다.
         item.setType(ITEM_VIEW_IMAGE_TYPE_OTHER) ;
-        item.setIconDrawable(iconDrawable); ;
+        //item.setIconDrawable(iconDrawable);
+        item.setUserProfileURI(userProfile);
         item.setUserId(userId);
         item.setImageURI(imageURI);
-        item.setDate(date); ;
+        item.setDate(date);
 
         listViewChatItemList.add(item) ;
     }
@@ -287,7 +331,7 @@ ITEM_VIEW_TYPE_INOUT = 4 ;
     }
 
     // 상대방의 텍스트 메시지
-    static class LeftTextViewHolder extends RecyclerView.ViewHolder{
+    public class LeftTextViewHolder extends RecyclerView.ViewHolder{
 
         CircleImageView profile;
         TextView userId;
@@ -305,7 +349,7 @@ ITEM_VIEW_TYPE_INOUT = 4 ;
     }
 
     // 내가 보낸 텍스트 메시지
-    static class RightTextViewHolder extends RecyclerView.ViewHolder{
+    public class RightTextViewHolder extends RecyclerView.ViewHolder{
 
         TextView message;
         TextView date;
@@ -319,7 +363,7 @@ ITEM_VIEW_TYPE_INOUT = 4 ;
     }
 
     // 상대방의 이미지 메시지
-    static class LeftImageViewHolder extends RecyclerView.ViewHolder{
+    public class LeftImageViewHolder extends RecyclerView.ViewHolder{
 
         CircleImageView profile;
         TextView userId;
@@ -333,11 +377,24 @@ ITEM_VIEW_TYPE_INOUT = 4 ;
             userId = itemView.findViewById(R.id.imgmessage_tv_nickname);
             image = itemView.findViewById(R.id.imgmessage_iv_message);
             date = itemView.findViewById(R.id.imgmessage_tv_date);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int pos = getAdapterPosition() ;
+                    if (pos != RecyclerView.NO_POSITION) {
+                        // 리스너 객체의 메서드 호출.
+                        if (mListener != null) {
+                            mListener.onItemClick(LeftImageViewHolder.this, v, pos) ;
+                        }
+                    }
+                }
+            });
         }
     }
 
     // 나의 이미지 메시지
-    static class RightImageViewHolder extends RecyclerView.ViewHolder{
+    public class RightImageViewHolder extends RecyclerView.ViewHolder{
 
         ImageView image;
         TextView date;
@@ -347,11 +404,24 @@ ITEM_VIEW_TYPE_INOUT = 4 ;
 
             image = itemView.findViewById(R.id.my_imgmessage_iv_message);
             date = itemView.findViewById(R.id.my_imgmessage_iv_date);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int pos = getAdapterPosition() ;
+                    if (pos != RecyclerView.NO_POSITION) {
+                        // 리스너 객체의 메서드 호출.
+                        if (myListener != null) {
+                            myListener.onItemClick(RightImageViewHolder.this, v, pos) ;
+                        }
+                    }
+                }
+            });
         }
     }
 
     // 유저 입장, 퇴장 표시
-    static class MiddleViewHolder extends RecyclerView.ViewHolder{
+    public class MiddleViewHolder extends RecyclerView.ViewHolder{
 
         TextView message;
 

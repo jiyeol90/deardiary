@@ -36,7 +36,8 @@ public class RegisterActivity extends AppCompatActivity {
     Button btn_register, btn_checkId;
 
     boolean isCheckedId = false;
-    String server_ip;
+    private String server_ip;
+    private String SERVER_URL;
 
     //private final String server_ip = getString(R.string.server_ip);
 
@@ -112,8 +113,8 @@ public class RegisterActivity extends AppCompatActivity {
         progressDialog.setTitle("Check The ID");
         progressDialog.show();
 
-        String uRl = "http://"+server_ip+"/loginregister/check_id.php";
-        StringRequest request = new StringRequest(Request.Method.POST, uRl, new Response.Listener<String>() {
+        SERVER_URL = "http://"+server_ip+"/loginregister/check_id.php";
+        StringRequest request = new StringRequest(Request.Method.POST, SERVER_URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response)
             {
@@ -161,8 +162,8 @@ public class RegisterActivity extends AppCompatActivity {
         progressDialog.setTitle("Registering New Account");
         progressDialog.show();
 
-        String uRl = "http://"+server_ip+"/loginregister/register.php";
-        StringRequest request = new StringRequest(Request.Method.POST, uRl, new Response.Listener<String>() {
+        SERVER_URL = "http://"+server_ip+"/loginregister/register.php";
+        StringRequest request = new StringRequest(Request.Method.POST, SERVER_URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response)
             {

@@ -14,8 +14,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -23,16 +21,13 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.error.AuthFailureError;
 import com.android.volley.error.VolleyError;
-import com.android.volley.request.JsonArrayRequest;
 import com.android.volley.request.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.material.badge.BadgeDrawable;
 import com.squareup.otto.Subscribe;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,12 +36,16 @@ import java.util.Map;
 
 public class MyChattingFragment extends Fragment {
 
-    private String MY_ID = UserInfo.getInstance().getId();
+    private String MY_ID;
 
     RecyclerView recyclerView;
     ChatRoomItem item;
     ArrayList<ChatRoomItem> items = new ArrayList<>();
     ChattingRoomAdapter adapter;
+    private HashMap<String, String> friendsMap;
+    private String server_ip;
+    private String SERVER_URL;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -60,19 +59,12 @@ public class MyChattingFragment extends Fragment {
         recyclerView= view.findViewById(R.id.recycler_room);
         adapter= new ChattingRoomAdapter(getActivity(), items);
 
+        server_ip = getString(R.string.server_ip);
 
+        //멤버변수에서 참조하면 가져오지 못한다. ex) private String MY_ID = UserInfo.getInstance().getId();
+        MY_ID = UserInfo.getInstance().getId();
 
         loadingRoomList();
-//        adapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.ic_profile_default), "james", "마지막 메시지", "2021-03-02 11 : 07");
-//        adapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.ic_profile_default), "james", "마지막 메시지", "2021-03-02 11 : 07");
-//        adapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.ic_profile_default), "james", "마지막 메시지", "2021-03-02 11 : 07");
-//        adapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.ic_profile_default), "james", "마지막 메시지", "2021-03-02 11 : 07");
-//        adapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.ic_profile_default), "james", "마지막 메시지", "2021-03-02 11 : 07");
-//        adapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.ic_profile_default), "james", "마지막 메시지", "2021-03-02 11 : 07");
-//        adapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.ic_profile_default), "james", "마지막 메시지", "2021-03-02 11 : 07");
-//        adapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.ic_profile_default), "james", "마지막 메시지", "2021-03-02 11 : 07");
-//        adapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.ic_profile_default), "james", "마지막 메시지", "2021-03-02 11 : 07");
-//        adapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.ic_profile_default), "james", "마지막 메시지", "2021-03-02 11 : 07");
 
     }
 
@@ -91,7 +83,7 @@ public class MyChattingFragment extends Fragment {
     private void loadingRoomList() {
         {
 
-            String SERVER_URL = "http://3.36.92.185/chattingdata/load_room_list.php";
+            SERVER_URL = "http://"+server_ip+"/chattingdata/load_room_list.php";
 
 
             // 나와 상대가 대화중인 방이 있는지 roomId를 얻어온 후
@@ -102,42 +94,44 @@ public class MyChattingFragment extends Fragment {
                 //volley 라이브러리의 GET방식은 버튼 누를때마다 새로운 갱신 데이터를 불러들이지 않음. 그래서 POST 방식 사용
                 @Override
                 public void onResponse(String response) {
-/*
-{
-    "room_id": "1",
-    "user_id": "james",
-    "content_type": "txt",
-    "content": "hello",
-    "created_date": "2021-03-08 06:30:14",
-    "friend": [
-            {
-            "user_id": "jiyeol90",
-            "user_profile": "default"
-            }
-        ]
-    },
- */
+                /*
+
+                   "room_id": "1",
+                   "user_id": "james",
+                   "content_type": "txt",
+                   "content": "hello",
+                   "created_date": "2021-03-08 06:30:14",
+                   "friend": [
+                           {
+                           "user_id": "jiyeol90",
+                           "user_profile": "default"
+                           }
+                       ]
+                   },
+                */
                     items.clear();
                     adapter.notifyDataSetChanged();
                     try {
                         JSONArray resJsonArray = new JSONArray(response);
                         Log.i("MYCHATTING", String.valueOf(resJsonArray.length()));
                         for(int i = 0; i < resJsonArray.length(); i++) {
-                            HashMap<String, String> friendMap = new HashMap<String, String>();
+                            friendsMap = new HashMap<String, String>();
                             JSONObject roomObject = resJsonArray.getJSONObject(i);
                             String roomId = roomObject.getString("room_id");
                             String userId = roomObject.getString("user_id");
                             String contentType = roomObject.getString("content_type");
                             String content = roomObject.getString("content");
                             String createdDate = roomObject.getString("created_date");
-                            JSONArray friendArray = roomObject.getJSONArray("friend");
+                            //채팅방에 참여하고 있는 멤버
+                           JSONArray friendArray = roomObject.getJSONArray("friend");
 
                             for(int j = 0; j < friendArray.length(); j++) {
                                 JSONObject friendObject = friendArray.getJSONObject(j);
                                 String friendId = friendObject.getString("user_id");
                                 String friendProfile = friendObject.getString("user_profile");
-                                friendMap.put(friendId, friendProfile);
+                                friendsMap.put(friendId, friendProfile);
                             }
+
                             System.out.println("\n[ " + i + " ] " + "번째 ROOM INFO");
                             System.out.println("roomId : " + roomId);
                             System.out.println("userId : " + userId);
@@ -145,17 +139,23 @@ public class MyChattingFragment extends Fragment {
                             System.out.println("createdDate : " + createdDate);
 
                             String clickedId = "";
-                            for(String key : friendMap.keySet()){
-                                clickedId = key;
-                                String value = friendMap.get(key);
+                            for(String key : friendsMap.keySet()){
+                                clickedId += (key+"/");
+                                String value = friendsMap.get(key);
 
                                 System.out.println(key+" : "+value);
                             }
-                            adapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.ic_profile_default),friendMap, contentType, content, createdDate, clickedId);
+
+                            clickedId = clickedId.substring(0, clickedId.length()-1); // 마지막에 추가된 slash를 떼어내기 위해
+
+                            //Toast.makeText(getActivity(), clickedId, Toast.LENGTH_SHORT).show();
+                            if(clickedId.contains("/")) {
+                                adapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.ic_group_chatroom), friendsMap, contentType, content, createdDate, clickedId, roomId);
+                            }else {
+                                adapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.ic_default_chatroom), friendsMap, contentType, content, createdDate, clickedId, roomId);
+                            }
                             //Variable 'clickedId' is accessed from within inner class, needs to be final or effectively fina
-
                         }
-
 
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -165,9 +165,14 @@ public class MyChattingFragment extends Fragment {
 
                         @Override
                         public void onItemClick(View v, int pos) {
-                            Toast.makeText(getActivity(), pos+" 번째 아이템", Toast.LENGTH_SHORT).show();
-                            UserInfo.getInstance().setClickedId(items.get(pos).getClickedId());
+                            //Toast.makeText(getActivity(), pos+" 번째 아이템", Toast.LENGTH_SHORT).show();
+                            item = items.get(pos);
+//                            HashMap friend = item.getFriendsMap();
+//                            String clickedid = item.getClickedId();
+                            UserInfo.getInstance().setClickedId(item.getClickedId());
                             Intent chatIntent = new Intent(getActivity(), MyChattingActivity.class);
+                            //해당 아이템의 친구리스트를 저장한다.
+                            chatIntent.putExtra("friendsMap", item.getFriendsMap());
                             startActivity(chatIntent);
                         }
                     });
@@ -191,7 +196,7 @@ public class MyChattingFragment extends Fragment {
 
 
                     //String postId = UserInfo.getInstance().getId();
-                    param.put("myId", MY_ID); //todo roomId 를 String? int?
+                    param.put("myId", MY_ID);
                     return param;
                 }
             };
@@ -218,5 +223,12 @@ public class MyChattingFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         BusProvider.getInstance().unregister(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        BusProvider.getInstance().post(new ChatEvent(true));
+        Log.d("OnResume","채팅방 목록으로 다시 들어온다.");
     }
 }

@@ -16,10 +16,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Deardiary"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ChattingActivity"/>
-        <activity android:name=".MyChattingActivity"/>
+        <activity android:name=".FriendListActivity"></activity>
+        <activity android:name=".ChattingActivity" />
+        <activity android:name=".MyChattingActivity" />
         <activity android:name=".CommentActivity" />
         <activity android:name=".ViewPostActivity" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.example.deardiary.fileprovider"
@@ -45,14 +47,14 @@
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />
+
         <service
-            android:name="MyFirebaseMessagingService"
+            android:name=".MyFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
     </application>
 
 </manifest>

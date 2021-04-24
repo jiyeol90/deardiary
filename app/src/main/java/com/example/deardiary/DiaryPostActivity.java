@@ -43,6 +43,8 @@ public class DiaryPostActivity extends AppCompatActivity {
 
     final int REQUEST_WIDTH = 512;
     final int REQUEST_HEIGHT = 512;
+    private String server_ip;
+    private String SERVER_URL;
     private static final String ROOT_URL = "http://3.36.92.185/uploads/file_upload.php";
     private static final int REQUEST_PERMISSIONS = 100;
     private static final int PICK_IMAGE_REQUEST = 1;
@@ -67,6 +69,9 @@ public class DiaryPostActivity extends AppCompatActivity {
         setContentView(R.layout.activity_diary_post);
         //이벤트 버스를 등록해 준다.
         BusProvider.getInstance().register(this);
+
+        server_ip = getString(R.string.server_ip);
+        SERVER_URL = "http://"+server_ip+"/uploads/file_upload.php";
 
         diaryImage = findViewById(R.id.diary_image);
         diaryText = findViewById(R.id.comment_text);
@@ -280,7 +285,8 @@ public class DiaryPostActivity extends AppCompatActivity {
 
 
     private void uploadBitmap(final Bitmap bitmap, final String content, final String tag, final String userId) {
-        SimpleMultiPartRequest smpr= new SimpleMultiPartRequest(Request.Method.POST, ROOT_URL, new Response.Listener<String>() {
+
+        SimpleMultiPartRequest smpr= new SimpleMultiPartRequest(Request.Method.POST, SERVER_URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 //new AlertDialog.Builder(DiaryPostActivity.this).setMessage("응답:"+response).create().show();

@@ -1,6 +1,7 @@
 package com.example.deardiary;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -45,6 +46,8 @@ public class CommentActivity extends AppCompatActivity {
     TextView comment_date;
     RecyclerView rcv_comment;
     Button btn_submit;
+    private String server_ip;
+    private String SERVER_URL;
 
     ArrayList<CommentItem> items= new ArrayList<>();
     CommentAdapter adapter;
@@ -56,6 +59,7 @@ public class CommentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comment);
 
+        server_ip = getString(R.string.server_ip);
         adapter= new CommentAdapter(getApplicationContext(), items);
 
         Intent intent = getIntent();
@@ -64,6 +68,8 @@ public class CommentActivity extends AppCompatActivity {
         user_profile = findViewById(R.id.userProfile);
         comment_text = findViewById(R.id.comment_text);
         rcv_comment = findViewById(R.id.rcv_comment);
+        rcv_comment.addItemDecoration(new DividerItemDecoration(this, 1)); //구분선 설정
+
         comment_date = findViewById(R.id.comment_date);
         btn_submit = findViewById(R.id.submit);
 
@@ -112,9 +118,9 @@ public class CommentActivity extends AppCompatActivity {
         progressDialog.setTitle("Upload Comment");
         progressDialog.show();
 
-        String serverUrl="http://3.36.92.185/loadingdata/upload_comment.php";
+        SERVER_URL="http://"+server_ip+"/loadingdata/upload_comment.php";
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, serverUrl, new Response.Listener<String>() {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, SERVER_URL, new Response.Listener<String>() {
             //volley 라이브러리의 GET방식은 버튼 누를때마다 새로운 갱신 데이터를 불러들이지 않음. 그래서 POST 방식 사용
             @Override
             public void onResponse(String response) {
@@ -165,9 +171,9 @@ public class CommentActivity extends AppCompatActivity {
         progressDialog.setTitle("Loading Comment");
         progressDialog.show();
 
-        String serverUrl="http://3.36.92.185/loadingdata/load_comment.php";
+        SERVER_URL = "http://"+server_ip+"/loadingdata/load_comment.php";
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, serverUrl, new Response.Listener<String>() {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, SERVER_URL, new Response.Listener<String>() {
             //volley 라이브러리의 GET방식은 버튼 누를때마다 새로운 갱신 데이터를 불러들이지 않음. 그래서 POST 방식 사용
             @Override
             public void onResponse(String response) {
@@ -198,7 +204,7 @@ public class CommentActivity extends AppCompatActivity {
                             //서버에서 저장된 이미지 url
                             imgPath = "default";
                         } else {
-                            imgPath = "http://3.36.92.185"+imgPath;
+                            imgPath = "http://"+server_ip+imgPath;
                         }
 
                         items.add(0, new CommentItem(imgPath, userId, content, date));
