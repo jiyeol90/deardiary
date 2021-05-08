@@ -66,8 +66,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v)
             {
-                String txtUserId = userId.getText().toString();
-                String txtPassword = password.getText().toString();
+                String txtUserId = userId.getText().toString().trim();
+                String txtPassword = password.getText().toString().trim();
                 if (TextUtils.isEmpty(txtUserId) || TextUtils.isEmpty(txtPassword)) {
                     Toast.makeText(MainActivity.this, "All fields required", Toast.LENGTH_SHORT).show();
                 } else {

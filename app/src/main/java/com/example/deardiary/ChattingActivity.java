@@ -36,6 +36,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+//예제
 public class ChattingActivity extends AppCompatActivity implements View.OnClickListener{
 
     private Handler mHandler;

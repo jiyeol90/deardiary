@@ -82,7 +82,7 @@ public class ViewPostActivity extends AppCompatActivity implements View.OnClickL
         iv_comment = findViewById(R.id.iv_comment);
         tv_viewCnt = findViewById(R.id.tv_viewCnt);
         tv_comment_cnt = findViewById(R.id.iv_comment_cnt);
-        tbn_heart = findViewById(R.id.tbn_heart);
+        //tbn_heart = findViewById(R.id.tbn_heart);
         tv_diary = findViewById(R.id.comment_text);
         tv_tag = findViewById(R.id.diary_tag);
         tv_date = findViewById(R.id.diary_date);
@@ -103,9 +103,9 @@ public class ViewPostActivity extends AppCompatActivity implements View.OnClickL
                 compoundButton.startAnimation(scaleAnimation);
 
 
-                    if (isChecked) { //하트를 해제할 경우
+                    if (isChecked) { //하트를 누를 경우
                         clicked = "1";
-                    } else { //하트를 누를 경우
+                    } else { //하트를 해제할 경우
                         clicked = "0";
                     }
                     loadLikeInfo(userId, postId);
@@ -321,6 +321,12 @@ public class ViewPostActivity extends AppCompatActivity implements View.OnClickL
 
         //요청큐에 요청 객체 생성
         requestQueue.add(jsonArrayRequest);
+    }
+
+    @Override
+    public void onBackPressed() {
+        BusProvider.getInstance().post(new BusEvent(true));
+        super.onBackPressed();
     }
 
     //이벤트버스 등록해제

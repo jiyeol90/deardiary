@@ -1,4 +1,10 @@
 package com.example.deardiary;
+import android.graphics.Color;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.Toast;
 import com.bumptech.glide.Glide;
 
@@ -17,7 +23,7 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ChattingListViewAdapter2 extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class ChattingListViewAdapter2 extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Filterable {
 
     private static final int ITEM_VIEW_TEXT_TYPE_OTHER = 0 ;
     private static final int ITEM_VIEW_TEXT_TYPE_MINE = 1 ;
@@ -30,6 +36,8 @@ public class ChattingListViewAdapter2 extends RecyclerView.Adapter<RecyclerView.
     private OnMyItemClickListener myListener = null;
 
     private ArrayList<ListViewChatItem> listViewChatItemList = new ArrayList<ListViewChatItem>() ;
+    private ArrayList<ListViewChatItem> filteredChatItemList = listViewChatItemList;
+
     private Context context;
 
     public ChattingListViewAdapter2(Context context) {
@@ -432,4 +440,69 @@ ITEM_VIEW_TYPE_INOUT = 4 ;
         }
     }
 
+
+    //검색 기능을 위한 Filter -> 태그를 검색할때 사용할것 채팅방에 어울리지 않는다.
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            //filteredChatItemList
+            //listViewChatItemList
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                String charString = constraint.toString();
+                if(charString.isEmpty()) {
+                    filteredChatItemList = listViewChatItemList;
+                } else {
+                    ArrayList<ListViewChatItem> filteringList = new ArrayList<>();
+                    for(ListViewChatItem item : listViewChatItemList) {
+                        String message = item.getMessage();
+                        if(!"".equals(message)) {
+                            if(message.contains(charString)) {
+                                filteringList.add(item);
+                            }
+                        }
+//                        if(item.getMessage().contains(charString)) {
+//                            filteringList.add(item);
+//                        }
+                    }
+                    filteredChatItemList = filteringList;
+                }
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = filteredChatItemList;
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                listViewChatItemList.clear();
+                listViewChatItemList.addAll(filteredChatItemList);
+                //filteredChatItemList = (ArrayList<ListViewChatItem>)results.values;
+                notifyDataSetChanged();
+            }
+        };
+    }
+
+    ArrayList getSeachList(String search) {
+        ArrayList<Integer> resultArray = new ArrayList<>();
+
+        int length = listViewChatItemList.size();
+
+        for(int i = 0; i < length; i++) {
+            ListViewChatItem item = listViewChatItemList.get(i);
+
+            String message = item.getMessage();
+
+            if(!"".equals(search)) {
+                if(message.contains(search)) {
+                    resultArray.add(i);
+                }
+            }
+        }
+
+        return resultArray;
+    }
+
 }
+
+

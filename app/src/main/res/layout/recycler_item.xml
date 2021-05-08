@@ -81,7 +81,7 @@
             android:layout_below="@+id/iv"
             android:gravity="right"
             android:layout_marginVertical="15dp"
-            android:layout_marginLeft="200dp"
+            android:layout_marginLeft="270dp"
             android:src="@drawable/ic_view_post" />
 
         <TextView
@@ -95,19 +95,20 @@
             android:layout_toRightOf="@+id/iv_view"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="16dp"/>
-        <ToggleButton
-            android:id="@+id/tbn_heart"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:background="@drawable/ic_heart_border"
-            android:checked = "false"
-            android:layout_marginTop="15dp"
-            android:layout_marginLeft="20dp"
-            android:layout_below="@id/iv"
-            android:layout_toRightOf="@id/tv_viewCnt"
-            android:text=""
-            android:textOff=""
-            android:textOn=""/>
+
+<!--        <ToggleButton-->
+<!--            android:id="@+id/tbn_heart"-->
+<!--            android:layout_width="25dp"-->
+<!--            android:layout_height="25dp"-->
+<!--            android:background="@drawable/ic_heart_border"-->
+<!--            android:checked = "false"-->
+<!--            android:layout_marginTop="15dp"-->
+<!--            android:layout_marginLeft="20dp"-->
+<!--            android:layout_below="@id/iv"-->
+<!--            android:layout_toRightOf="@id/tv_viewCnt"-->
+<!--            android:text=""-->
+<!--            android:textOff=""-->
+<!--            android:textOn=""/>-->
 
     </RelativeLayout>
 

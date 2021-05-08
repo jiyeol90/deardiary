@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import com.android.volley.Response;
 import com.android.volley.error.VolleyError;
 import com.android.volley.request.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
+import com.squareup.otto.Subscribe;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,6 +38,15 @@ public class MyHomeFragment extends Fragment {
     private String server_ip;
     private String SERVER_URL;
 
+
+    //이벤트 버스 등록
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d("생명주기 :", "onCreate()");
+        BusProvider.getInstance().register(this);
+    }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -47,6 +58,19 @@ public class MyHomeFragment extends Fragment {
         //서버의 loadDBtoJson.php파일에 접속하여 (DB데이터들)결과 받기
         //Volley+ 라이브러리 사용
 
+        loadPost();
+
+    }
+
+    @Subscribe
+    public void busStop(BusEvent busEvent) {//public항상 붙여줘야함
+        if(busEvent.isFlag()) {
+            Log.i("BusEvent", "포스팅 로딩하기");
+            loadPost();
+        }
+    }
+
+    private void loadPost() {
         //서버주소
         SERVER_URL="http://"+server_ip+"/loadingdata/load_post.php";
 
@@ -57,7 +81,7 @@ public class MyHomeFragment extends Fragment {
             //volley 라이브러리의 GET방식은 버튼 누를때마다 새로운 갱신 데이터를 불러들이지 않음. 그래서 POST 방식 사용
             @Override
             public void onResponse(JSONArray response) {
-               // Toast.makeText(getActivity(), response.toString(), Toast.LENGTH_SHORT).show();
+                // Toast.makeText(getActivity(), response.toString(), Toast.LENGTH_SHORT).show();
 
 
                 //파라미터로 응답받은 결과 JsonArray를 분석
@@ -73,6 +97,7 @@ public class MyHomeFragment extends Fragment {
                         String no= jsonObject.getString("id"); //diaraypage.id -> 다이어리 아이디
                         String name=jsonObject.getString("user_id"); // diarypage.user_id -> 다이어리 작성 아이디
                         String imgPath=jsonObject.getString("img_src"); // diarypage.img_src -> 다이어리 이미지 src
+                        String viewCnt = jsonObject.getString("hit_view");
                         String date=jsonObject.getString("created_date"); // diarypage.created_date -> 다이어리 생성일
 
                         if(userProfile.equals("null")) {
@@ -83,7 +108,7 @@ public class MyHomeFragment extends Fragment {
                         //이미지 경로의 경우 서버 IP가 제외된 주소이므로(uploads/xxxx.jpg) 바로 사용 불가.
                         imgPath = "http://"+server_ip+imgPath;
 
-                        items.add(0, new PostItem(no, name, userProfile, imgPath, date)); // 첫 번째 매개변수는 몇번째에 추가 될지, 제일 위에 오도록
+                        items.add(0, new PostItem(no, name, userProfile, imgPath, viewCnt, date)); // 첫 번째 매개변수는 몇번째에 추가 될지, 제일 위에 오도록
                         //adapter.notifyDataSetChanged();
                         adapter.notifyItemInserted(0);
 
@@ -103,6 +128,9 @@ public class MyHomeFragment extends Fragment {
                     LinearLayoutManager layoutManager= new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false);
                     recyclerView.setLayoutManager(layoutManager);
 
+                    if(!UserInfo.getInstance().getScrollPosition().equals("-1")) {
+                        recyclerView.scrollToPosition(Integer.parseInt(UserInfo.getInstance().getScrollPosition()));
+                    }
                 } catch (JSONException e) {e.printStackTrace();}
 
             }
@@ -129,5 +157,13 @@ public class MyHomeFragment extends Fragment {
 
 
         return rootView;
+    }
+
+    //반드시 해지해준다.
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        UserInfo.getInstance().setScrollPosition("-1");
+        BusProvider.getInstance().unregister(this);
     }
 }

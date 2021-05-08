@@ -132,6 +132,9 @@ public class MyChattingFragment extends Fragment {
                                 friendsMap.put(friendId, friendProfile);
                             }
 
+                            String notiCnt = roomObject.getString("noti");
+
+
                             System.out.println("\n[ " + i + " ] " + "번째 ROOM INFO");
                             System.out.println("roomId : " + roomId);
                             System.out.println("userId : " + userId);
@@ -150,9 +153,9 @@ public class MyChattingFragment extends Fragment {
 
                             //Toast.makeText(getActivity(), clickedId, Toast.LENGTH_SHORT).show();
                             if(clickedId.contains("/")) {
-                                adapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.ic_group_chatroom), friendsMap, contentType, content, createdDate, clickedId, roomId);
+                                adapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.ic_group_chatroom), friendsMap, contentType, content, createdDate, clickedId, roomId, notiCnt);
                             }else {
-                                adapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.ic_default_chatroom), friendsMap, contentType, content, createdDate, clickedId, roomId);
+                                adapter.addItem(ContextCompat.getDrawable(getContext(), R.drawable.ic_default_chatroom), friendsMap, contentType, content, createdDate, clickedId, roomId, notiCnt);
                             }
                             //Variable 'clickedId' is accessed from within inner class, needs to be final or effectively fina
                         }
@@ -195,7 +198,7 @@ public class MyChattingFragment extends Fragment {
                     HashMap<String, String> param = new HashMap<>();
 
 
-                    //String postId = UserInfo.getInstance().getId();
+                    String MY_ID = UserInfo.getInstance().getId();
                     param.put("myId", MY_ID);
                     return param;
                 }

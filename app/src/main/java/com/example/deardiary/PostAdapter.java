@@ -133,6 +133,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             vh.btnEdit.setVisibility(View.INVISIBLE);
         } else {
             vh.btnEdit.setTag(holder.getAdapterPosition());
+
             vh.btnEdit.setOnClickListener(new View.OnClickListener() {
 
                 @Override
@@ -173,6 +174,27 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         
         //vh.tvMsg.setText(item.getMsg());
         Glide.with(holder.itemView.getContext()).load(item.getImgPath()).into(vh.iv);
+
+
+        vh.iv.setTag(holder.getAdapterPosition());
+        //포스팅을 클릭할때 해당 유저의 포스팅으로 이동한다.
+        vh.iv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int position = (int) v.getTag();
+                UserInfo.getInstance().setScrollPosition(Integer.toString(position));
+
+                PostItem item = items.get(position);
+                String postId = item.getNo();
+                String userId = item.getUserId();
+                Intent viewPostIntent = new Intent(context, ViewPostActivity.class);
+                viewPostIntent.putExtra("userId", userId);
+                viewPostIntent.putExtra("postId", postId);
+                context.startActivity(viewPostIntent);
+            }
+        });
+
+        vh.tvCnt.setText(item.getViewCnt());
     }
 
     //포스팅 삭제
@@ -220,6 +242,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
         TextView tvName;
         TextView tvDate;
+        TextView tvCnt;
         CircleImageView userProfile;
         ImageButton btnEdit;
         ImageView iv;
@@ -229,6 +252,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
             tvName = itemView.findViewById(R.id.tv_userId);
             tvDate = itemView.findViewById(R.id.tv_date);
+            tvCnt = itemView.findViewById(R.id.tv_viewCnt);
             userProfile=itemView.findViewById(R.id.userProfile);
             btnEdit = itemView.findViewById(R.id.edit_button);
             iv = itemView.findViewById(R.id.iv);

@@ -8,7 +8,7 @@ public class ListViewChatItem {
     // 아이템 타입을 구분하기 위한 type 변수.
     private int type ;
 
-    private String message;
+    private String message = "";
     private String userId;
     private String imageURI;
 

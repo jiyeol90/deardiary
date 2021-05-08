@@ -71,6 +71,13 @@ public class ChattingRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         ((RoomViewHolder)holder).lastMessage.setText(chatRoomitem.getContent());
         ((RoomViewHolder)holder).date.setText(chatRoomitem.getDate());
 
+        if(!chatRoomitem.getNotiCnt().equals("0")) {
+            ((RoomViewHolder)holder).stackMessage.setVisibility(View.VISIBLE);
+            ((RoomViewHolder)holder).stackMessage.setText(chatRoomitem.getNotiCnt());
+        } else {
+            ((RoomViewHolder)holder).stackMessage.setVisibility(View.INVISIBLE);
+        }
+
     }
 
 //    @Override
@@ -102,8 +109,8 @@ public class ChattingRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 //        return listViewChatItemList.get(position);
 //    }
 
-    public void addItem(Drawable iconDrawable, HashMap<String, String> friendsMap, String contentType, String content, String date, String clickedId, String roomId) {
-        ChatRoomItem item = new ChatRoomItem(iconDrawable, friendsMap, contentType, content, date, roomId) ;
+    public void addItem(Drawable iconDrawable, HashMap<String, String> friendsMap, String contentType, String content, String date, String clickedId, String roomId, String notiCnt) {
+        ChatRoomItem item = new ChatRoomItem(iconDrawable, friendsMap, contentType, content, date, roomId, notiCnt) ;
         item.setClickedId(clickedId);
 
 //        String friend = "";
@@ -138,6 +145,7 @@ public class ChattingRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         TextView userId;
         TextView lastMessage;
         TextView date;
+        TextView stackMessage;
 
         public RoomViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -146,6 +154,7 @@ public class ChattingRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             userId = itemView.findViewById(R.id.chatroom_tv_userId);
             lastMessage = itemView.findViewById(R.id.chatroom_tv_message);
             date = itemView.findViewById(R.id.chatroom_tv_date);
+            stackMessage = itemView.findViewById(R.id.noti_msg_cnt);
 
             itemView.setOnClickListener(new View.OnClickListener() {
 

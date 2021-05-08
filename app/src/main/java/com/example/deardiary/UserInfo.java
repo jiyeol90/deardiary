@@ -14,6 +14,8 @@ public class UserInfo {
     private String roomId = "";
     private String userName;
     private String clickedId = "";
+    private String scrollPosition = "-1"; //포스팅 보기에서 돌아올때의 위치
+
     //사용자가 나중에 입력해줄 값들은 초기화 해준다.
     private String userText = "";
     private String userProfile = "default"; //초기값으로 default를 설정해 준다.
@@ -79,4 +81,12 @@ public class UserInfo {
     public String getRoomId() { return roomId; }
 
     public void setRoomId(String roomId) { this.roomId = roomId; }
+
+    public String getScrollPosition() {
+        return scrollPosition;
+    }
+
+    public void setScrollPosition(String scrollPosition) {
+        this.scrollPosition = scrollPosition;
+    }
 }

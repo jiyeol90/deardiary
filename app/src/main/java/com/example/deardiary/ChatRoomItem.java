@@ -16,17 +16,19 @@ public class ChatRoomItem {
     private String clickedId;
     private String imageURI;
     private HashMap<String, String> friendsMap;
+    private String notiCnt; //부재중 메시지가 올때 채팅방 리스트에 띄어줄 메시지
 
     private Drawable iconDrawable ;
     private String date;
     //iconDrawable, friendMap, contentType, content, date
-    public ChatRoomItem(Drawable iconDrawable, HashMap<String, String> friendsMap, String contentType, String content, String date, String roomId) {
+    public ChatRoomItem(Drawable iconDrawable, HashMap<String, String> friendsMap, String contentType, String content, String date, String roomId, String notiCnt) {
         this.iconDrawable = iconDrawable;
         this.friendsMap = friendsMap;
         this.contentType = contentType;
         this.content = content;
         this.date = date;
         this.roomId = roomId;
+        this.notiCnt = notiCnt;
     }
 
     public int getType() {
@@ -96,4 +98,8 @@ public class ChatRoomItem {
     public String getRoomId() { return roomId; }
 
     public void setRoomId(String roomId) { this.roomId = roomId; }
+
+    public String getNotiCnt() { return notiCnt; }
+
+    public void setNotiCnt(String notiCnt) { this.notiCnt = notiCnt; }
 }

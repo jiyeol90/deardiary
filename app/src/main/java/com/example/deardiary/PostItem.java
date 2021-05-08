@@ -3,20 +3,22 @@ package com.example.deardiary;
 //포스팅을 연속적으로 보여줄때의 데이터값들
 public class PostItem {
 
-    String no;
+    String no; //포스트 ID
     String userId;
     String userProfile;
     String imgPath;
     String date;
+    String viewCnt;
 
     public PostItem() {
     }
 
-    public PostItem(String no, String userId, String userProfile, String imgPath, String date) {
+    public PostItem(String no, String userId, String userProfile, String imgPath, String viewCnt, String date) {
         this.no = no;
         this.userId = userId;
         this.userProfile = userProfile;
         this.imgPath = imgPath;
+        this.viewCnt = viewCnt;
         this.date = date;
     }
 
@@ -55,4 +57,8 @@ public class PostItem {
     public void setDate(String date) {
         this.date = date;
     }
+
+    public String getViewCnt() { return viewCnt; }
+
+    public void setViewCnt(String viewCnt) { this.viewCnt = viewCnt; }
 }
