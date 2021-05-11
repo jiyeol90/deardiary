@@ -6,6 +6,25 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <uses-feature
+        android:name="android.hardware.camera.any"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.flash"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.front"
+        android:required="false" />
 
     <application
         android:allowBackup="false"
@@ -16,7 +35,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Deardiary"
         android:usesCleartextTraffic="true">
-        <activity android:name=".FriendListActivity"></activity>
+        <activity android:name=".LiveMediaActivity"></activity>
+        <activity android:name=".Broadcasting" />
+        <activity android:name=".FriendListActivity" />
         <activity android:name=".ChattingActivity" />
         <activity android:name=".MyChattingActivity" />
         <activity android:name=".CommentActivity" />

@@ -1,2 +1,3 @@
+include ':libbambuser'
 include ':app'
 rootProject.name = "deardiary"

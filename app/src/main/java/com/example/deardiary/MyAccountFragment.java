@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,6 +53,7 @@ public class MyAccountFragment extends Fragment {
     private TextView tv_friends_cnt;
     private CircleImageView iv_profile;
     private Button btn_profile;
+    private ImageButton btn_streaming;
     private ImageView iv_post;
 
     private String server_ip;
@@ -82,7 +84,6 @@ public class MyAccountFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         Log.d("생명주기 :", "onViewCreated()");
         rcv_grid = view.findViewById(R.id.grid_view);
-
 
         //userindex값을 받아서 Volley의 JsonArrayRequest로 보낸다.
         String userIndex = UserInfo.getInstance().getIndex();
@@ -284,6 +285,7 @@ public class MyAccountFragment extends Fragment {
         tv_friends_cnt = rootView.findViewById(R.id.tv_friends_count);
         iv_profile = rootView.findViewById(R.id.iv_profile);
         tv_profileText = rootView.findViewById(R.id.profile_text);
+        btn_streaming = rootView.findViewById(R.id.btn_streaming);
         //friends_text
 
         //포스팅 버튼
@@ -313,6 +315,19 @@ public class MyAccountFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(),FriendListActivity.class);
+                //startActivityForResult(intent,REQUEST_CODE);
+                //결과값으로 가져올 데이터가 없으므로 새로운 인텐트를 띄어준다.
+                startActivity(intent);
+            }
+        });
+
+
+        btn_streaming.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getActivity(), "방송 준비",Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getActivity(),Broadcasting.class);
                 //startActivityForResult(intent,REQUEST_CODE);
                 //결과값으로 가져올 데이터가 없으므로 새로운 인텐트를 띄어준다.
                 startActivity(intent);

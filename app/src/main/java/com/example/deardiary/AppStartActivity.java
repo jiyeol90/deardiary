@@ -25,18 +25,12 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.error.AuthFailureError;
 import com.android.volley.error.VolleyError;
-import com.android.volley.request.JsonObjectRequest;
 import com.android.volley.request.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.messaging.FirebaseMessaging;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,7 +53,7 @@ public class AppStartActivity extends AppCompatActivity {
 
     Fragment accountFragment;
     Fragment homeFragment;
-    Fragment noteFragment;
+    Fragment liveFragment;
     Fragment chattingFragment;
 
     @Override
@@ -100,7 +94,8 @@ public class AppStartActivity extends AppCompatActivity {
                             // Log and toast
                             String msg = getString(R.string.msg_token_fmt, FCM_TOKEN);
                             Log.d("FCM", msg);
-                            Toast.makeText(AppStartActivity.this, msg, Toast.LENGTH_SHORT).show();
+                            //토큰정보
+                            //Toast.makeText(AppStartActivity.this, msg, Toast.LENGTH_SHORT).show();
 
                             saveFCMToken();
                             //토큰값을 얻어오기 전에 Volley 통신을 하니깐 계속 token값이 빈 문자열이다.
@@ -119,7 +114,7 @@ public class AppStartActivity extends AppCompatActivity {
 
         accountFragment = new MyAccountFragment();
         homeFragment = new MyHomeFragment();
-        noteFragment = new MyNoteFragment();
+        liveFragment = new MyLiveFragment();
         chattingFragment = new MyChattingFragment();
 
         setFragment(0); //첫 프래그먼트 화면을 지정한다.
@@ -134,7 +129,6 @@ public class AppStartActivity extends AppCompatActivity {
                 switch (item.getItemId()) {
 
                     case R.id.btn_account:
-
                         setFragment(0);
                         break;
 
@@ -142,7 +136,7 @@ public class AppStartActivity extends AppCompatActivity {
                         setFragment(1);
                         break;
 
-                    case R.id.btn_note:
+                    case R.id.btn_live:
                         setFragment(2);
                         break;
 
@@ -171,10 +165,6 @@ public class AppStartActivity extends AppCompatActivity {
 //
 //            startActivity(directToChattingIntent);
 //        }
-
-
-
-
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -243,7 +233,7 @@ public class AppStartActivity extends AppCompatActivity {
             @Override
             public void onResponse(String response)
             {
-                Toast.makeText(context, response, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context, response, Toast.LENGTH_SHORT).show();
             }
         }, new Response.ErrorListener() {
             @Override
@@ -297,7 +287,7 @@ public class AppStartActivity extends AppCompatActivity {
                 break;
 
             case 2:
-                fragmentTransaction.replace(R.id.main_frame, noteFragment);
+                fragmentTransaction.replace(R.id.main_frame, liveFragment);
                 fragmentTransaction.commit();
                 break;
 

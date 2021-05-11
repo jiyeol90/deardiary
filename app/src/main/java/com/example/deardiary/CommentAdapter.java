@@ -21,7 +21,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
     Context context;
     ArrayList<CommentItem> items;
 
-
     public CommentAdapter(Context context, ArrayList<CommentItem> items) {
         this.context = context;
         this.items = items;

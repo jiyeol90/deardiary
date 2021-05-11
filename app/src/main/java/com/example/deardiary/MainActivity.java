@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
 
                         if (resJsonArray.length() != 0) {
                             progressDialog.dismiss();
-                            Toast.makeText(MainActivity.this, response, Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(MainActivity.this, response, Toast.LENGTH_SHORT).show();
                             for (int i = 0; i < resJsonArray.length(); i++) {
                                 JSONObject jsonObject = resJsonArray.getJSONObject(i);
 

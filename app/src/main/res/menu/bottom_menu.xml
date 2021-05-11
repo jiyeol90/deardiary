@@ -13,10 +13,10 @@
         android:title="Home"/>
 
     <item
-        android:id="@+id/btn_note"
+        android:id="@+id/btn_live"
         android:enabled="true"
-        android:icon="@drawable/ic_note"
-        android:title="Note"/>
+        android:icon="@drawable/ic_live_streaming"
+        android:title="Live"/>
 
     <item
         android:id="@+id/btn_chatting"

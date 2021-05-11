@@ -19,6 +19,18 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.474" />
 
+    <ImageButton
+        android:id="@+id/btn_streaming"
+        android:layout_width="37dp"
+        android:layout_height="33dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/ic_live_streaming"
+        android:backgroundTint="@color/pink_500"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.042"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/profile_text"
         android:layout_width="135dp"
